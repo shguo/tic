@@ -3,7 +3,7 @@ import Foundation
 
 enum MenuBarDisplayComposer {
     /// 自绘日历图标尺寸（`MenuBarCalendarIcon`）。
-    static let menuBarIconSize = CGSize(width: 18, height: 16)
+    static let menuBarIconSize = CGSize(width: 18, height: 18)
     static var menuBarIconWidth: CGFloat { menuBarIconSize.width }
     static let iconTextSpacing: CGFloat = 4
     /// 菜单栏标签左右内边距（仅计入 `NSStatusItem.length`）。

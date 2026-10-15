@@ -55,7 +55,8 @@ flowchart LR
 
 ### 图标
 
-- [`MenuBarCalendarIcon.swift`](../Tic/Sources/MenuBarCalendarIcon.swift)：自绘日历页（轮廓 + 实心页眉 + 当天日期），18×16，替代原 SF Symbol `calendar.circle.fill`（在菜单栏中偏小）。
+- [`MenuBarCalendarIcon.swift`](../Tic/Sources/MenuBarCalendarIcon.swift)：造型取自 App 图标（轮廓 + 实心页眉 + 两个装订环 + 当天日期），18×18，替代原 SF Symbol `calendar.circle.fill`（在菜单栏中偏小）。
+- 装订环用 `.blendMode(.destinationOut)` 在页眉上挖出一圈缝隙，需配合 `.compositingGroup()`，否则挖空会穿透到菜单栏背景以外的层。
 - 同一视图既用于状态栏位图，也经 `templateImage(day:)` 用于设置页预览；只用黑色绘制，保持模板图规则。
 - 日期随标签刷新（至少每 60 秒）更新，跨零点最多延迟一分钟。
 
