@@ -110,6 +110,45 @@ final class TicTests: XCTestCase {
 
     // MARK: - 版本比较（检查更新）
 
+    // MARK: - 检查更新：API 限流降级
+
+    private var repoPath: String { "\(TrustedDownloadPolicy.repoOwner)/\(TrustedDownloadPolicy.repoName)" }
+
+    private func httpResponse(_ status: Int, headers: [String: String] = [:]) -> HTTPURLResponse {
+        HTTPURLResponse(url: URL(string: "https://api.github.com/")!, statusCode: status, httpVersion: nil, headerFields: headers)!
+    }
+
+    func testUpdateRateLimitDetection() {
+        XCTAssertTrue(UpdateService.isRateLimited(httpResponse(429)))
+        XCTAssertTrue(UpdateService.isRateLimited(httpResponse(403, headers: ["X-RateLimit-Remaining": "0"])))
+        XCTAssertTrue(UpdateService.isRateLimited(httpResponse(403)))
+        XCTAssertFalse(UpdateService.isRateLimited(httpResponse(403, headers: ["X-RateLimit-Remaining": "42"])))
+        XCTAssertFalse(UpdateService.isRateLimited(httpResponse(200)))
+        let reset = UpdateService.rateLimitResetDate(httpResponse(403, headers: ["X-RateLimit-Reset": "1792056056"]))
+        XCTAssertEqual(reset, Date(timeIntervalSince1970: 1792056056))
+    }
+
+    func testReleaseFromLatestPageURLBuildsTrustedDMG() throws {
+        let service = UpdateService()
+        let url = URL(string: "https://github.com/\(repoPath)/releases/tag/v1.3.5")!
+        let release = try XCTUnwrap(service.releaseFromLatestPageURL(url))
+        XCTAssertEqual(release.tagName, "v1.3.5")
+        XCTAssertEqual(release.body, "")
+        XCTAssertEqual(
+            release.dmgDownloadURL?.absoluteString,
+            "https://github.com/\(repoPath)/releases/download/v1.3.5/Tic-v1.3.5-macOS.dmg"
+        )
+        XCTAssertTrue(TrustedDownloadPolicy.isTrustedReleaseAssetURL(release.dmgDownloadURL!, expectedVersion: "1.3.5"))
+    }
+
+    func testReleaseFromLatestPageURLRejectsUnexpectedURLs() {
+        let service = UpdateService()
+        XCTAssertNil(service.releaseFromLatestPageURL(URL(string: "https://github.com/\(repoPath)/releases")!))
+        XCTAssertNil(service.releaseFromLatestPageURL(URL(string: "https://github.com/someone/else/releases/tag/v9.9.9")!))
+        XCTAssertNil(service.releaseFromLatestPageURL(URL(string: "https://evil.example.com/\(repoPath)/releases/tag/v1.3.5")!))
+        XCTAssertNil(service.releaseFromLatestPageURL(URL(string: "https://github.com/\(repoPath)/releases/tag/nightly")!))
+    }
+
     func testUpdateServiceComparesSemVer() {
         let service = UpdateService()
         XCTAssertTrue(service.isNewer(latest: "1.3.0", current: "1.2.6"))
