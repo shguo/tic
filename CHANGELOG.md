@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+## [1.3.3] - 2026-10-15
+
 ### 定制版（shguo/tic）
 
 - 本仓库为 [NicCraver/tic](https://github.com/NicCraver/tic) 的定制分支：`main` 跟随上游，`custom` 为发布线
@@ -155,7 +157,8 @@
 - 登录时自动启动
 - macOS 应用图标
 
-[Unreleased]: https://github.com/NicCraver/tic/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/shguo/tic/compare/v1.3.3...HEAD
+[1.3.3]: https://github.com/shguo/tic/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/NicCraver/tic/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/NicCraver/tic/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/NicCraver/tic/compare/v1.2.6...v1.3.0
