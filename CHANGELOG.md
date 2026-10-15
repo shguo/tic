@@ -5,6 +5,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- 启动台 / 程序坞中 App 图标显示为直角方块：图标集各尺寸原为无透明通道的满版方图，macOS 不会自动裁圆角。现按 Apple macOS 图标模板（824×824 连续圆角 + 透明四角 + 投影）重新生成，生成脚本见 `scripts/make-app-icon.swift`
+
 ## [1.3.2] - 2026-07-10
 
 ### Fixed
