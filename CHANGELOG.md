@@ -5,6 +5,11 @@
 
 ## [Unreleased]
 
+### 定制版（shguo/tic）
+
+- 本仓库为 [NicCraver/tic](https://github.com/NicCraver/tic) 的定制分支：`main` 跟随上游，`custom` 为发布线
+- 检查更新 / DMG 下载白名单 / 关于页链接改为指向 `shguo/tic`（`TrustedDownloadPolicy.repoOwner` 单一来源）
+
 ### Fixed
 
 - 切换到行数不同的月份（5 行 ↔ 6 行）时弹窗被移到屏幕外：`MenuBarPopoverWindowAnchor` 在窗口 frame 仍为 `.zero` 时记录了顶边锚点 0，现只在窗口拥有落在屏幕上的有效 frame 时记录锚点，并兜底不把窗口挪出所有屏幕

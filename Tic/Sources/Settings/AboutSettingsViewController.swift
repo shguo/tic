@@ -5,6 +5,10 @@ final class AboutSettingsViewController: SettingsPaneViewController {
     init() { super.init(title: "关于") }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
+    private static var repoURLString: String {
+        "https://github.com/\(TrustedDownloadPolicy.repoOwner)/\(TrustedDownloadPolicy.repoName)"
+    }
+
     private var appVersion: String {
         let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         let build = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
@@ -23,12 +27,12 @@ final class AboutSettingsViewController: SettingsPaneViewController {
                 SettingsLinkRow(
                     title: "反馈与问题",
                     subtitle: "GitHub Issues",
-                    urlString: "https://github.com/NicCraver/tic/issues"
+                    urlString: "\(Self.repoURLString)/issues"
                 ),
                 SettingsLinkRow(
                     title: "开源仓库",
-                    subtitle: "github.com/NicCraver/tic",
-                    urlString: "https://github.com/NicCraver/tic"
+                    subtitle: "github.com/\(TrustedDownloadPolicy.repoOwner)/\(TrustedDownloadPolicy.repoName)",
+                    urlString: Self.repoURLString
                 ),
             ]),
         ]

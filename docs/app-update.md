@@ -52,7 +52,7 @@ sequenceDiagram
 
 - **当前版本**：`Bundle.main` 的 `CFBundleShortVersionString`（与 `project.yml` 中 `MARKETING_VERSION` 一致）
 - **最新版本**：GitHub `tag_name` 去 `v` 前缀后 SemVer 比较（`UpdateService.isNewer`）
-- **API**：`https://api.github.com/repos/NicCraver/tic/releases/latest`
+- **API**：`https://api.github.com/repos/shguo/tic/releases/latest`
 - **请求头**：`Accept: application/vnd.github+json`，`User-Agent: Tic/{version}`
 - **响应上限**：512KB
 - **错误**：403/429 视为限流；仅手动检查时弹窗
@@ -64,7 +64,7 @@ sequenceDiagram
 | 自动检查时刻 | 每天 10:00（`Calendar.autoupdatingCurrent`，随 macOS 系统时区；改时区后自动重算下次触发） |
 | 启动补检 | 今日 10:00 后未检查，或距上次查询 ≥ 24 小时 |
 | UserDefaults | `me.nic.tic.lastUpdateCheckTime`、`me.nic.tic.dismissedUpdateVersion` |
-| Releases 列表页 | `https://github.com/NicCraver/tic/releases` |
+| Releases 列表页 | `https://github.com/shguo/tic/releases` |
 | Logger | `me.nic.tic` / `UpdateService` |
 
 ## 踩坑与约束

@@ -41,8 +41,8 @@ enum UpdateError: LocalizedError, Sendable {
 
 /// 通过 GitHub Releases API 检查新版本。
 final class UpdateService: Sendable {
-    private static let owner = "NicCraver"
-    private static let repo = "tic"
+    private static let owner = TrustedDownloadPolicy.repoOwner
+    private static let repo = TrustedDownloadPolicy.repoName
     private static let releasesURL =
         "https://api.github.com/repos/\(owner)/\(repo)/releases/latest"
 

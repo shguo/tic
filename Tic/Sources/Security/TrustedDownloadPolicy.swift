@@ -2,7 +2,8 @@ import Foundation
 
 /// 更新包下载与落盘的安全策略（域名白名单、文件名、路径约束）。
 enum TrustedDownloadPolicy {
-    static let repoOwner = "NicCraver"
+    /// 发布源仓库（定制版发布在 fork；上游为 NicCraver/tic）。
+    static let repoOwner = "shguo"
     static let repoName = "tic"
     private static let githubHosts: Set<String> = ["github.com"]
     private static let cdnHosts: Set<String> = [
