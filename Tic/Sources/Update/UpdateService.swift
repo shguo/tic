@@ -13,7 +13,8 @@ struct GitHubRelease: Sendable {
 enum UpdateError: LocalizedError, Sendable {
     case invalidURL
     case invalidResponse
-    case rateLimited
+    /// GitHub 匿名 API 限流（每 IP 每小时 60 次，公司 / 校园网等共享出口很容易耗尽）。
+    case rateLimited(resetAt: Date?)
     case apiError(statusCode: Int)
     case parseError
     case untrustedDownloadURL
@@ -25,8 +26,12 @@ enum UpdateError: LocalizedError, Sendable {
             return "更新地址无效"
         case .invalidResponse:
             return "服务器响应无效"
-        case .rateLimited:
-            return "GitHub API 请求过于频繁，请稍后再试"
+        case .rateLimited(let resetAt):
+            guard let resetAt else { return "GitHub API 请求过于频繁，请稍后再试" }
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "zh_CN")
+            formatter.dateFormat = "HH:mm"
+            return "GitHub API 请求过于频繁，请于 \(formatter.string(from: resetAt)) 后再试"
         case .apiError(let code):
             return "服务器返回错误（\(code)）"
         case .parseError:
@@ -54,6 +59,11 @@ final class UpdateService: Sendable {
         URL(string: "https://github.com/\(owner)/\(repo)/releases")!
     }
 
+    /// 网页端「最新版本」入口，302 跳转到 `/releases/tag/<tag>`；不走 API，不计入限流。
+    static var latestReleasePageURL: URL {
+        URL(string: "https://github.com/\(owner)/\(repo)/releases/latest")!
+    }
+
     private let logger = Logger(subsystem: "me.nic.tic", category: "UpdateService")
     private let session: URLSession = {
         let config = URLSessionConfiguration.ephemeral
@@ -64,6 +74,33 @@ final class UpdateService: Sendable {
     }()
 
     func checkForUpdates() async throws -> GitHubRelease? {
+        let release: GitHubRelease
+        do {
+            release = try await fetchLatestReleaseFromAPI()
+        } catch let UpdateError.rateLimited(resetAt) {
+            logger.notice("GitHub API 已限流，改用网页跳转获取最新版本")
+            do {
+                release = try await fetchLatestReleaseFromWebPage()
+            } catch {
+                logger.error("网页跳转获取最新版本失败：\(error.localizedDescription)")
+                throw UpdateError.rateLimited(resetAt: resetAt)
+            }
+        }
+
+        let latestVersion = stripVersionPrefix(release.tagName)
+        guard isNewer(latest: latestVersion, current: Self.currentVersion) else {
+            return nil
+        }
+        guard let dmgURL = release.dmgDownloadURL,
+              TrustedDownloadPolicy.isTrustedReleaseAssetURL(dmgURL, expectedVersion: latestVersion)
+        else {
+            logger.error("Release DMG URL 未通过安全校验")
+            throw UpdateError.untrustedDownloadURL
+        }
+        return release
+    }
+
+    private func fetchLatestReleaseFromAPI() async throws -> GitHubRelease {
         guard let url = URL(string: Self.releasesURL) else {
             throw UpdateError.invalidURL
         }
@@ -79,8 +116,8 @@ final class UpdateService: Sendable {
             throw UpdateError.invalidResponse
         }
 
-        if httpResponse.statusCode == 403 || httpResponse.statusCode == 429 {
-            throw UpdateError.rateLimited
+        if Self.isRateLimited(httpResponse) {
+            throw UpdateError.rateLimited(resetAt: Self.rateLimitResetDate(httpResponse))
         }
 
         guard httpResponse.statusCode == 200 else {
@@ -98,18 +135,65 @@ final class UpdateService: Sendable {
             throw UpdateError.responseTooLarge
         }
 
-        let release = try parseRelease(data: data)
-        let latestVersion = stripVersionPrefix(release.tagName)
-        guard isNewer(latest: latestVersion, current: Self.currentVersion) else {
-            return nil
-        }
-        guard let dmgURL = release.dmgDownloadURL,
-              TrustedDownloadPolicy.isTrustedReleaseAssetURL(dmgURL, expectedVersion: latestVersion)
+        return try parseRelease(data: data)
+    }
+
+    /// 限流降级：请求网页端 `/releases/latest`，从跳转后的地址解析版本号。
+    /// 拿不到发布说明，DMG 地址按发版命名规则拼出（仍经 `TrustedDownloadPolicy` 校验）。
+    private func fetchLatestReleaseFromWebPage() async throws -> GitHubRelease {
+        var request = URLRequest(url: Self.latestReleasePageURL)
+        request.httpMethod = "HEAD"
+        request.setValue("Tic/\(Self.currentVersion)", forHTTPHeaderField: "User-Agent")
+
+        let (_, response) = try await session.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200,
+              let finalURL = httpResponse.url,
+              let release = releaseFromLatestPageURL(finalURL)
         else {
-            logger.error("Release DMG URL 未通过安全校验")
-            throw UpdateError.untrustedDownloadURL
+            throw UpdateError.invalidResponse
         }
         return release
+    }
+
+    /// 由 `/releases/latest` 跳转后的 `/<owner>/<repo>/releases/tag/<tag>` 构造发布信息。`internal` 以便单元测试。
+    func releaseFromLatestPageURL(_ url: URL) -> GitHubRelease? {
+        guard url.scheme?.lowercased() == "https", url.host?.lowercased() == "github.com" else { return nil }
+        let parts = url.pathComponents.filter { $0 != "/" }
+        guard parts.count == 5,
+              parts[0].caseInsensitiveCompare(Self.owner) == .orderedSame,
+              parts[1].caseInsensitiveCompare(Self.repo) == .orderedSame,
+              parts[2] == "releases", parts[3] == "tag"
+        else { return nil }
+
+        let tagName = parts[4]
+        let version = stripVersionPrefix(tagName)
+        guard !parseVersion(version).isEmpty else { return nil }
+        let dmgURL = URL(string: "https://github.com/\(Self.owner)/\(Self.repo)/releases/download/\(tagName)/"
+            + TrustedDownloadPolicy.expectedDMGFilename(version: version))
+        return GitHubRelease(
+            tagName: tagName,
+            name: tagName,
+            body: "",
+            htmlURL: url,
+            dmgDownloadURL: dmgURL,
+            publishedAt: nil
+        )
+    }
+
+    /// 429，或 403 且剩余额度为 0 才算限流；其他 403（如仓库不可见）按普通错误处理。
+    static func isRateLimited(_ response: HTTPURLResponse) -> Bool {
+        if response.statusCode == 429 { return true }
+        guard response.statusCode == 403 else { return false }
+        guard let remaining = response.value(forHTTPHeaderField: "X-RateLimit-Remaining") else { return true }
+        return remaining == "0"
+    }
+
+    static func rateLimitResetDate(_ response: HTTPURLResponse) -> Date? {
+        guard let raw = response.value(forHTTPHeaderField: "X-RateLimit-Reset"),
+              let seconds = TimeInterval(raw)
+        else { return nil }
+        return Date(timeIntervalSince1970: seconds)
     }
 
     /// 校验响应体积是否在上限内。`internal` 以便单元测试。
