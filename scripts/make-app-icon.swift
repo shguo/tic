@@ -1,17 +1,28 @@
 import AppKit
 import SwiftUI
 
-// 用法：swift scripts/make-app-icon.swift Tic/Resources/AppIcon-1024-opaque.png Tic/Assets.xcassets/AppIcon.appiconset 1.04
-// macOS 不会给 App 图标自动裁圆角，源图为不透明方图时需用本脚本生成带透明四角的各尺寸 PNG。
-// 按 Apple macOS 图标模板：1024 画布，824×824 连续圆角矩形（半径 185.4），四周透明 + 轻微投影。
+// 用法：swift scripts/make-app-icon.swift <源 1024 PNG> <输出目录> [源图圆角半径 px，默认 204]
+//   swift scripts/make-app-icon.swift Tic/Resources/AppIcon-1024-opaque.png Tic/Assets.xcassets/AppIcon.appiconset
+//
+// macOS 不会给 App 图标自动裁圆角。源图是「圆角瓷砖铺满画布 + 四角白底」的不透明方图，
+// 本脚本把整张图按 Apple 模板缩进 1024 画布中央 824×824 区域（不放大、不裁内容），
+// 蒙版贴合源图自身的圆角（实测为普通圆角 r≈204px），仅去掉四角白底，保留外圈光影边，
+// 再加一层轻微投影。
 let args = CommandLine.arguments
 let src = NSImage(contentsOfFile: args[1])!
 let outDir = URL(fileURLWithPath: args[2])
-let bleed = args.count > 3 ? CGFloat(Double(args[3])!) : 1.0
+let sourceCornerRadius = args.count > 3 ? CGFloat(Double(args[3])!) : 204
+/// 蒙版向内收的源图像素，去掉圆角外缘与白底混合的毛边。
+let sourceInset: CGFloat = 1
 
 let canvas: CGFloat = 1024
 let tile = CGRect(x: 100, y: 100, width: 824, height: 824)
-let path = RoundedRectangle(cornerRadius: 185.4, style: .continuous).path(in: tile).cgPath
+let scale = tile.width / canvas
+let maskRect = tile.insetBy(dx: sourceInset * scale, dy: sourceInset * scale)
+let path = MainActor.assumeIsolated {
+    RoundedRectangle(cornerRadius: (sourceCornerRadius - sourceInset) * scale, style: .circular)
+        .path(in: maskRect).cgPath
+}
 
 func render(size: Int) -> Data {
     let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: size, pixelsHigh: size, bitsPerSample: 8,
@@ -25,17 +36,16 @@ func render(size: Int) -> Data {
     let s = CGFloat(size) / canvas
     cg.scaleBy(x: s, y: s)
 
-    // 投影（模板：向下偏移、柔和）
+    // 投影（向下偏移、柔和）
     cg.saveGState()
     cg.setShadow(offset: CGSize(width: 0, height: -10), blur: 28, color: NSColor.black.withAlphaComponent(0.30).cgColor)
     cg.addPath(path); cg.setFillColor(NSColor.white.cgColor); cg.fillPath()
     cg.restoreGState()
 
-    // 内容裁切到圆角矩形
+    // 整张源图缩放进模板区域，按源图自身圆角裁掉四角白底
     cg.saveGState()
     cg.addPath(path); cg.clip()
-    let drawRect = tile.insetBy(dx: -tile.width * (bleed - 1) / 2, dy: -tile.height * (bleed - 1) / 2)
-    src.draw(in: drawRect, from: .zero, operation: .copy, fraction: 1)
+    src.draw(in: tile, from: .zero, operation: .copy, fraction: 1)
     cg.restoreGState()
 
     NSGraphicsContext.restoreGraphicsState()
