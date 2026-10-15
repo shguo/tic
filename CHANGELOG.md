@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+## [1.3.5] - 2026-10-15
+
 ### Fixed
 
 - App 图标圆角裁切过多，外圈光影过渡被裁掉：改为整图不放大缩进模板区域，蒙版贴合源图自身圆角（普通圆角 r≈204px），仅去掉四角白底
@@ -167,7 +169,8 @@
 - 登录时自动启动
 - macOS 应用图标
 
-[Unreleased]: https://github.com/shguo/tic/compare/v1.3.4...HEAD
+[Unreleased]: https://github.com/shguo/tic/compare/v1.3.5...HEAD
+[1.3.5]: https://github.com/shguo/tic/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/shguo/tic/compare/v1.3.3...v1.3.4
 [1.3.3]: https://github.com/shguo/tic/compare/v1.3.2...v1.3.3
 [1.3.2]: https://github.com/NicCraver/tic/compare/v1.3.1...v1.3.2
