@@ -37,7 +37,7 @@ flowchart LR
 
 1. **占位串**：`widestCompose` 得到各模块最宽组合（农历含「闰十一月三十」），再 `wideningDigits` 把数字换成 `8`（等宽数字下最宽字形）。
 2. **量宽**：`reservedTextWidth(for:)` 对占位串取 `labelFont` / `labelDigitFont` 测量的较大值。
-3. **总宽**：`textSlotWidth` +（可选图标 16 + 间距 4）+ `labelHorizontalInset * 2`（当前为 0）。
+3. **总宽**：`textSlotWidth` +（可选图标 `menuBarIconSize.width` 18 + 间距 4；仅图标时不加间距）+ `labelHorizontalInset * 2`（当前为 0）。
 4. **渲染**：`MenuBarRenderedLabel` 在 `labelWidth` 画布内将**实时** `displayText` 居中；画布宽度不变，故菜单栏项不抖。
 
 ### 模板图着色（壁纸 / 深浅色）
@@ -52,6 +52,12 @@ flowchart LR
 | 外观切换 | 监听 `AppleInterfaceThemeChangedNotification` 重新 `renderLabelImage()` |
 
 系统会把模板图按当前菜单栏对比度着色（浅壁纸上偏浅、深壁纸上偏深等）。
+
+### 图标
+
+- [`MenuBarCalendarIcon.swift`](../Tic/Sources/MenuBarCalendarIcon.swift)：自绘日历页（轮廓 + 实心页眉 + 当天日期），18×16，替代原 SF Symbol `calendar.circle.fill`（在菜单栏中偏小）。
+- 同一视图既用于状态栏位图，也经 `templateImage(day:)` 用于设置页预览；只用黑色绘制，保持模板图规则。
+- 日期随标签刷新（至少每 60 秒）更新，跨零点最多延迟一分钟。
 
 ### 字重与字号
 

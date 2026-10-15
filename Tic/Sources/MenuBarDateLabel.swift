@@ -102,10 +102,7 @@ private struct MenuBarRenderedLabel: View {
     var body: some View {
         HStack(spacing: MenuBarDisplayComposer.iconTextSpacing) {
             if metrics.showsIcon {
-                Image(systemName: "calendar.circle.fill")
-                    .font(.menuBarLabel)
-                    .symbolRenderingMode(.monochrome)
-                    .foregroundStyle(MenuBarTemplateStyle.foreground)
+                MenuBarCalendarIcon(day: metrics.iconDay)
             }
             if !metrics.displayText.isEmpty {
                 Text(metrics.displayText)

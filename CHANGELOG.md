@@ -9,6 +9,7 @@
 
 - 本仓库为 [NicCraver/tic](https://github.com/NicCraver/tic) 的定制分支：`main` 跟随上游，`custom` 为发布线
 - 检查更新 / DMG 下载白名单 / 关于页链接改为指向 `shguo/tic`（`TrustedDownloadPolicy.repoOwner` 单一来源）
+- 状态栏图标改为自绘日历页（`MenuBarCalendarIcon`）：显示当天日期，尺寸 18×16，替代偏小的 SF Symbol `calendar.circle.fill`；设置页预览同步
 
 ### Fixed
 

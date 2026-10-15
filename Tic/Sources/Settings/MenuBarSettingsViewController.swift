@@ -22,8 +22,7 @@ final class MenuBarSettingsViewController: SettingsPaneViewController {
     private var use24Hour: Bool { AppSettings.bool(forKey: AppSettings.use24HourKey, default: true) }
 
     override func makeContent() -> [NSView] {
-        previewIcon.image = NSImage(systemSymbolName: "calendar.circle.fill", accessibilityDescription: nil)
-        previewIcon.symbolConfiguration = NSImage.SymbolConfiguration(pointSize: 13, weight: .regular)
+        previewIcon.contentTintColor = .labelColor
         previewIcon.setContentHuggingPriority(.required, for: .horizontal)
         previewLabel.font = .monospacedDigitSystemFont(ofSize: 13, weight: .regular)
 
@@ -58,6 +57,7 @@ final class MenuBarSettingsViewController: SettingsPaneViewController {
 
     private func updatePreview() {
         previewIcon.isHidden = !MenuBarDisplayComposer.showsIcon(order: blockOrder, enabled: enabledBlocks)
+        previewIcon.image = MenuBarCalendarIcon.templateImage(day: Calendar.current.component(.day, from: .now))
         previewLabel.stringValue = MenuBarDisplayComposer.compose(
             date: .now,
             order: blockOrder,

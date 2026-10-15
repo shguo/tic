@@ -5,6 +5,8 @@ struct MenuBarLabelMetrics {
     let textSlotWidth: CGFloat
     let labelWidth: CGFloat
     let showsIcon: Bool
+    /// 图标内显示的当天日期。
+    let iconDay: Int
     let updateInterval: TimeInterval
 
     static func current(date: Date = .now) -> MenuBarLabelMetrics {
@@ -46,6 +48,7 @@ struct MenuBarLabelMetrics {
             textSlotWidth: textSlotWidth,
             labelWidth: labelWidth,
             showsIcon: showsIcon,
+            iconDay: Calendar.current.component(.day, from: date),
             updateInterval: interval
         )
     }
