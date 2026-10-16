@@ -5,6 +5,13 @@
 
 ## [Unreleased]
 
+## [1.3.8] - 2026-10-16
+
+### 定制版（shguo/tic）
+
+- 农历详情卡片下方显示当日「宜 / 忌」（LunarSwift 黄历数据，本地计算、不联网）：按黄历原顺序单行显示，超出一行时行尾渐隐；点击弹出完整宜忌列表，样式与年月选择弹层一致
+- 设置 → 日历 新增「显示宜忌」开关（默认开启）；开启后弹窗略高，切换日期 / 月份时尺寸不变
+
 ## [1.3.7] - 2026-10-16
 
 ### 定制版（shguo/tic）
@@ -196,7 +203,8 @@
 - 登录时自动启动
 - macOS 应用图标
 
-[Unreleased]: https://github.com/shguo/tic/compare/v1.3.7...HEAD
+[Unreleased]: https://github.com/shguo/tic/compare/v1.3.8...HEAD
+[1.3.8]: https://github.com/shguo/tic/compare/v1.3.7...v1.3.8
 [1.3.7]: https://github.com/shguo/tic/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/shguo/tic/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/shguo/tic/compare/v1.3.4...v1.3.5
