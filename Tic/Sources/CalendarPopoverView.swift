@@ -205,22 +205,20 @@ struct CalendarPopoverView: View {
         let nextMonthSlots = changesMonth ? monthSlots(for: newDate) : nil
         let nextUpcomingEvents = upcomingEvents(from: newDate)
 
-        let updates = {
+        guard changesMonth, let nextMonthSlots else {
             selectedDate = newDate
             upcomingEvents = nextUpcomingEvents
-            if changesMonth {
-                displayedMonth = newDate
-                if let nextMonthSlots {
-                    monthSlots = nextMonthSlots
-                }
-                pickerYear = calendar.component(.year, from: newDate)
-            }
+            return
         }
 
-        if changesMonth {
-            withOptionalAnimation(.easeOut(duration: 0.10), updates)
-        } else {
-            updates()
+        withoutAnimation {
+            monthSlots = nextMonthSlots
+            upcomingEvents = nextUpcomingEvents
+        }
+        withOptionalAnimation(.easeOut(duration: 0.10)) {
+            selectedDate = newDate
+            displayedMonth = newDate
+            pickerYear = calendar.component(.year, from: newDate)
         }
     }
 
@@ -237,18 +235,20 @@ struct CalendarPopoverView: View {
         let today = CalendarPopoverSelection.today(now: .now, calendar: calendar)
         let nextMonthSlots = monthSlots(for: today.displayedMonth)
         let nextUpcomingEvents = upcomingEvents(from: today.selectedDate)
+        withoutAnimation {
+            monthSlots = nextMonthSlots
+            upcomingEvents = nextUpcomingEvents
+            isMonthPickerPresented = false
+        }
         let updates = {
             selectedDate = today.selectedDate
             displayedMonth = today.displayedMonth
-            monthSlots = nextMonthSlots
-            upcomingEvents = nextUpcomingEvents
             pickerYear = calendar.component(.year, from: today.selectedDate)
-            isMonthPickerPresented = false
         }
         if animated {
             withOptionalAnimation(.easeInOut(duration: 0.18), updates)
         } else {
-            updates()
+            withoutAnimation(updates)
         }
     }
 
@@ -287,11 +287,13 @@ struct CalendarPopoverView: View {
         let nextSelectedDate = preservingSelectedDay ? dateInMonth(newMonth, matchingDayOf: selectedDate) : newMonth
         let nextMonthSlots = monthSlots(for: newMonth)
         let nextUpcomingEvents = upcomingEvents(from: nextSelectedDate)
+        withoutAnimation {
+            monthSlots = nextMonthSlots
+            upcomingEvents = nextUpcomingEvents
+        }
         withOptionalAnimation(.easeInOut(duration: 0.18)) {
             displayedMonth = newMonth
             selectedDate = nextSelectedDate
-            monthSlots = nextMonthSlots
-            upcomingEvents = nextUpcomingEvents
             pickerYear = calendar.component(.year, from: newMonth)
         }
     }
@@ -348,6 +350,15 @@ struct CalendarPopoverView: View {
             return try updates()
         }
         return try withAnimation(animation, updates)
+    }
+
+    /// 切换月份时，网格与「后续提醒」等决定弹窗高度的内容一步换到位，与窗口尺寸同帧完成；
+    /// 若随动画过渡，窗口已跳到新高度而内容仍在滑动、新旧两月叠影，看起来像抖动。
+    /// 月份 / 年份 / 农历等数字仍在带动画的事务里更新，保留滚动效果。
+    private func withoutAnimation(_ updates: () -> Void) {
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction, updates)
     }
 }
 
