@@ -60,11 +60,26 @@ struct CalendarPopoverView: View {
         calendar.component(.year, from: displayedMonth)
     }
 
+    /// 网格当前展示的年份。与 `displayedYear` 不同，它随 `monthSlots` 一步到位更新，不参与数字滚动动画，
+    /// 依赖它的布局（缺数据横幅）因此与窗口尺寸同步变化。
+    private var gridYear: Int {
+        monthSlots.lazy.compactMap(\.date).first.map { calendar.component(.year, from: $0) } ?? displayedYear
+    }
+
     /// 当前查看年份缺少内置法定调休数据时的非阻断提示（随翻年自动更新）。
     private var dataCoverageNotice: String? {
-        HolidayStore.shared.isYearUncovered(displayedYear)
-            ? "\(displayedYear) 年放假安排待更新"
+        HolidayStore.shared.isYearUncovered(gridYear)
+            ? "\(gridYear) 年放假安排待更新"
             : nil
+    }
+
+    /// 弹窗总高，由当前布局状态直接算出；内容与窗口都按它定高。
+    private var popoverHeight: CGFloat {
+        CalendarPopoverLayout.popoverHeight(
+            gridRowCount: CalendarPopoverLayout.gridRowCount(slotCount: monthSlots.count),
+            showsDataCoverageBanner: dataCoverageNotice != nil,
+            upcomingEventCount: upcomingEvents.count
+        )
     }
 
     private var relativeOffsetLabel: String? {
@@ -91,12 +106,13 @@ struct CalendarPopoverView: View {
                 onNextMonth: { shiftMonth(by: 1) },
                 onShowSettings: showSettings
             )
+            .frame(height: CalendarPopoverLayout.headerHeight)
             .popover(isPresented: $isMonthPickerPresented, arrowEdge: .top) {
                 monthYearPicker
             }
             .padding(.horizontal, 20)
-            .padding(.top, 8)
-            .padding(.bottom, 16)
+            .padding(.top, CalendarPopoverLayout.headerTopPadding)
+            .padding(.bottom, CalendarPopoverLayout.headerBottomPadding)
 
             if let dataCoverageNotice {
                 dataCoverageBanner(dataCoverageNotice)
@@ -104,7 +120,7 @@ struct CalendarPopoverView: View {
 
             CalendarWeekdayRow(palette: palette)
                 .padding(.horizontal, 20)
-                .padding(.bottom, 12)
+                .padding(.bottom, CalendarPopoverLayout.weekdayRowBottomPadding)
 
             CalendarMonthGridView(
                 slots: monthSlots,
@@ -121,10 +137,12 @@ struct CalendarPopoverView: View {
                 upcomingEvents: upcomingEvents,
                 palette: palette
             )
-            .padding(.top, 14)
+            .padding(.top, CalendarPopoverLayout.detailsTopSpacing)
         }
-        .frame(maxWidth: .infinity, alignment: .top)
+        // 显式定高并贴顶：窗口尺寸由 PopoverWindowSizer 在同一次更新里设成同一高度，内容不会在窗口里居中错位。
+        .frame(width: CalendarPopoverLayout.width, height: popoverHeight, alignment: .top)
         .background(palette.background)
+        .background { PopoverWindowSizer(height: popoverHeight) }
         .preferredColorScheme(AppTheme(rawValue: appThemeRaw)?.colorScheme)
         .focusable()
         .focusEffectDisabled()
@@ -151,10 +169,12 @@ struct CalendarPopoverView: View {
             refreshCalendarData(displayedMonth: displayedMonth, selectedDate: selectedDate)
         }
         .background {
-            MenuBarWindowVisibilityObserver {
-                // MenuBarExtra 会保留 @State；主窗从隐藏到显示时回到今天（Issue #2）。
-                resetSelectionToToday()
-            }
+            MenuBarWindowVisibilityObserver(
+                // MenuBarExtra 会保留 @State；收起时就回到今天，下次打开时窗口直接是今天这个月的尺寸，
+                // 不会先闪出上次的高度（Issue #2）。打开时再检查一次，覆盖跨零点等情况。
+                onBecomeVisible: { resetSelectionToToday() },
+                onBecomeHidden: { resetSelectionToToday() }
+            )
         }
         .onChange(of: showSolarTerms) {
             refreshCalendarData(displayedMonth: displayedMonth, selectedDate: selectedDate)
@@ -267,13 +287,13 @@ struct CalendarPopoverView: View {
         }
         .foregroundStyle(palette.secondaryText)
         .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .frame(height: CalendarPopoverLayout.dataCoverageBannerHeight)
         .background(palette.controlBackground, in: RoundedRectangle(cornerRadius: 8))
         .overlay {
             RoundedRectangle(cornerRadius: 8).strokeBorder(palette.controlBorder)
         }
         .padding(.horizontal, 20)
-        .padding(.bottom, 12)
+        .padding(.bottom, CalendarPopoverLayout.dataCoverageBannerBottomPadding)
         .accessibilityElement(children: .combine)
     }
 

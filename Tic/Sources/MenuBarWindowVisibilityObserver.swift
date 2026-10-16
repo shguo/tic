@@ -1,20 +1,21 @@
 import AppKit
 import SwiftUI
 
-/// 观察 `MenuBarExtra` 宿主窗口的可见性：从隐藏到显示时回调。
+/// 观察 `MenuBarExtra` 宿主窗口的可见性：从隐藏到显示、从显示到隐藏时分别回调。
 /// 打开月份选择器不会隐藏主窗，因此不会误触发。
 struct MenuBarWindowVisibilityObserver: NSViewRepresentable {
     var onBecomeVisible: () -> Void
+    var onBecomeHidden: () -> Void = {}
 
     func makeNSView(context: Context) -> NSView {
         let view = ObserverView()
-        context.coordinator.bind(view: view, onBecomeVisible: onBecomeVisible)
+        context.coordinator.bind(view: view, onBecomeVisible: onBecomeVisible, onBecomeHidden: onBecomeHidden)
         return view
     }
 
     func updateNSView(_ nsView: NSView, context: Context) {
         guard let view = nsView as? ObserverView else { return }
-        context.coordinator.bind(view: view, onBecomeVisible: onBecomeVisible)
+        context.coordinator.bind(view: view, onBecomeVisible: onBecomeVisible, onBecomeHidden: onBecomeHidden)
     }
 
     static func dismantleNSView(_ nsView: NSView, coordinator: Coordinator) {
@@ -37,12 +38,14 @@ struct MenuBarWindowVisibilityObserver: NSViewRepresentable {
     @MainActor
     final class Coordinator {
         var onBecomeVisible: (() -> Void)?
+        var onBecomeHidden: (() -> Void)?
         private weak var observedWindow: NSWindow?
         private var wasVisible = false
         private var observations: [NSObjectProtocol] = []
 
-        func bind(view: ObserverView, onBecomeVisible: @escaping () -> Void) {
+        func bind(view: ObserverView, onBecomeVisible: @escaping () -> Void, onBecomeHidden: @escaping () -> Void) {
             self.onBecomeVisible = onBecomeVisible
+            self.onBecomeHidden = onBecomeHidden
             view.onWindowChanged = { [weak self] window in
                 Task { @MainActor in
                     guard let self else { return }
@@ -78,6 +81,8 @@ struct MenuBarWindowVisibilityObserver: NSViewRepresentable {
                 NSWindow.didBecomeKeyNotification,
                 NSWindow.didExposeNotification,
                 NSWindow.didResignKeyNotification,
+                // 收起弹窗时窗口被 orderOut，遮挡状态随之变化。
+                NSWindow.didChangeOcclusionStateNotification,
             ]
             for name in names {
                 observations.append(center.addObserver(
@@ -96,7 +101,9 @@ struct MenuBarWindowVisibilityObserver: NSViewRepresentable {
                 queue: .main
             ) { [weak self] _ in
                 Task { @MainActor in
-                    self?.wasVisible = false
+                    guard let self, self.wasVisible else { return }
+                    self.wasVisible = false
+                    self.onBecomeHidden?()
                 }
             })
 
@@ -107,8 +114,11 @@ struct MenuBarWindowVisibilityObserver: NSViewRepresentable {
             guard let window = observedWindow else { return }
             let visible = window.isVisible
             defer { wasVisible = visible }
-            guard visible, !wasVisible else { return }
-            onBecomeVisible?()
+            if visible, !wasVisible {
+                onBecomeVisible?()
+            } else if !visible, wasVisible {
+                onBecomeHidden?()
+            }
         }
     }
 }

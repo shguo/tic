@@ -12,7 +12,7 @@ struct CalendarMonthGridView: View {
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
 
     private var rowCount: Int {
-        Int(ceil(Double(slots.count) / 7.0))
+        CalendarPopoverLayout.gridRowCount(slotCount: slots.count)
     }
 
     private var rowSpacing: CGFloat {

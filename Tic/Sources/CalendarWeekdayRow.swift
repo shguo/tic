@@ -12,7 +12,7 @@ struct CalendarWeekdayRow: View {
                 Text(weekday)
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(palette.primaryText)
-                    .frame(height: 18)
+                    .frame(height: CalendarPopoverLayout.weekdayRowHeight)
                     .frame(maxWidth: .infinity)
             }
         }

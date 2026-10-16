@@ -40,7 +40,7 @@ struct CalendarUpcomingRowView: View {
                 .accessibilityLabel("还有\(event.daysUntil)天")
             }
         }
-        .frame(height: 65)
+        .frame(height: CalendarPopoverLayout.upcomingRowHeight)
         .padding(.horizontal, 18)
         .accessibilityElement(children: .combine)
     }
