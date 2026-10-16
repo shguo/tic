@@ -131,6 +131,15 @@ final class TicTests: XCTestCase {
         XCTAssertEqual(events.map(\.kind), [.solarTerm, .festival, .festival])
     }
 
+    func testUpcomingDateLabelShowsGregorianAndLunar() {
+        // 公历节日、农历节日、节气统一为「公历 | 农历 | 星期」
+        let events = ChineseCalendarSupport.upcomingEvents(from: gregorianDate(2026, 10, 16), limit: .max, includeSolarTerms: true)
+        func label(_ title: String) -> String? { events.first { $0.title == title }?.dateLabel }
+        XCTAssertEqual(label("重阳节"), "10月18日 | 九月初九 | 周日")
+        XCTAssertEqual(label("霜降"), "10月23日 | 九月十四 | 周五")
+        XCTAssertEqual(label("平安夜"), "12月24日 | 冬月十六 | 周四")
+    }
+
     // MARK: - 版本比较（检查更新）
 
     // MARK: - 检查更新：API 限流降级

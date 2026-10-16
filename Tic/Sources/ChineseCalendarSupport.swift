@@ -433,7 +433,7 @@ enum ChineseCalendarSupport {
                 candidates.append(CalendarEventCandidate(
                     date: date,
                     title: festival.eventTitle,
-                    dateLabel: lunarDateLabel(for: date),
+                    dateLabel: upcomingDateLabel(for: date),
                     priority: 1,
                     kind: .festival
                 ))
@@ -461,7 +461,7 @@ enum ChineseCalendarSupport {
                 candidates.append(CalendarEventCandidate(
                     date: date,
                     title: template.eventTitle,
-                    dateLabel: gregorianDateLabel(for: date),
+                    dateLabel: upcomingDateLabel(for: date),
                     priority: 1,
                     kind: .festival
                 ))
@@ -473,7 +473,7 @@ enum ChineseCalendarSupport {
                 candidates.append(CalendarEventCandidate(
                     date: event.date,
                     title: event.eventTitle,
-                    dateLabel: gregorianDateLabel(for: event.date),
+                    dateLabel: upcomingDateLabel(for: event.date),
                     priority: 1,
                     kind: .festival
                 ))
@@ -494,7 +494,7 @@ enum ChineseCalendarSupport {
                 candidates.append(CalendarEventCandidate(
                     date: term.date,
                     title: term.name,
-                    dateLabel: lunarDateLabel(for: term.date),
+                    dateLabel: upcomingDateLabel(for: term.date),
                     priority: 2,
                     kind: .solarTerm
                 ))
@@ -580,12 +580,10 @@ enum ChineseCalendarSupport {
         return true
     }
 
-    private static func gregorianDateLabel(for date: Date) -> String {
-        "\(gregorian.component(.month, from: date))月\(gregorian.component(.day, from: date))日 | \(weekdayLabel(for: date))"
-    }
-
-    private static func lunarDateLabel(for date: Date) -> String {
-        "\(lunarMonthDayLabel(for: date)) | \(weekdayLabel(for: date))"
+    /// 「后续提醒」日期：所有类型统一为「公历 | 农历 | 星期」，如「10月18日 | 九月初九 | 周日」。
+    static func upcomingDateLabel(for date: Date) -> String {
+        let gregorianLabel = "\(gregorian.component(.month, from: date))月\(gregorian.component(.day, from: date))日"
+        return "\(gregorianLabel) | \(lunarMonthDayLabel(for: date)) | \(weekdayLabel(for: date))"
     }
 
     private static func weekdayLabel(for date: Date) -> String {
