@@ -23,6 +23,16 @@ struct CalendarPopoverHeader: View {
         return ceil(("88月" as NSString).size(withAttributes: [.font: font]).width)
     }()
 
+    private static let badgeFontSize: CGFloat = 10
+    private static let badgeHorizontalPadding: CGFloat = 7
+
+    /// 天数标签按三位数（「999天后」）等宽数字预留宽度：「5天后」与「123天后」胶囊一样宽，后面的图标不再左右挪动。
+    /// 超过三位数时按实际内容撑开。
+    static let badgeTextWidth: CGFloat = {
+        let font = NSFont.monospacedDigitSystemFont(ofSize: badgeFontSize, weight: .medium)
+        return ceil(("999天后" as NSString).size(withAttributes: [.font: font]).width)
+    }()
+
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             HStack(alignment: .lastTextBaseline, spacing: 8) {
@@ -51,28 +61,10 @@ struct CalendarPopoverHeader: View {
                 .accessibilityLabel("选择年份")
 
                 if let relativeOffsetLabel {
-                    Text(relativeOffsetLabel)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(palette.accent)
-                        .fixedSize()
-                        .padding(.horizontal, 7)
-                        .frame(height: 16)
-                        .background(palette.accent.opacity(0.10), in: Capsule())
-                        .overlay {
-                            Capsule().strokeBorder(palette.accent.opacity(0.18))
-                        }
+                    badge(relativeOffsetLabel)
                         .accessibilityLabel("相对今天\(relativeOffsetLabel)")
                 } else if let nextRestDayCountdownLabel {
-                    Text(nextRestDayCountdownLabel)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(palette.accent)
-                        .fixedSize()
-                        .padding(.horizontal, 7)
-                        .frame(height: 16)
-                        .background(palette.accent.opacity(0.10), in: Capsule())
-                        .overlay {
-                            Capsule().strokeBorder(palette.accent.opacity(0.18))
-                        }
+                    badge(nextRestDayCountdownLabel)
                         .accessibilityLabel("距离\(nextRestDayCountdownLabel)")
                 }
 
@@ -98,6 +90,21 @@ struct CalendarPopoverHeader: View {
                 )
             }
         }
+    }
+
+    private func badge(_ text: String) -> some View {
+        Text(text)
+            .font(.system(size: Self.badgeFontSize, weight: .medium))
+            .monospacedDigit()
+            .foregroundStyle(palette.accent)
+            .fixedSize()
+            .frame(minWidth: Self.badgeTextWidth)
+            .padding(.horizontal, Self.badgeHorizontalPadding)
+            .frame(height: 16)
+            .background(palette.accent.opacity(0.10), in: Capsule())
+            .overlay {
+                Capsule().strokeBorder(palette.accent.opacity(0.18))
+            }
     }
 
     private var monthNavigationControl: some View {

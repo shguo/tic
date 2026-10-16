@@ -54,6 +54,24 @@ final class CalendarPopoverLayoutTests: XCTestCase {
         }
     }
 
+    func testBadgeWidthIsFixed() {
+        // 天数标签一位到三位数、今天 / 明天 / 昨天，胶囊同宽：标题行总宽一致，后面的图标不挪动
+        let palette = CalendarPopoverTheme.palette(for: .light)
+        let widths = ["明天", "今天", "5天后", "36天前", "123天后", "999天后", "888天前"].map { label -> CGFloat in
+            let header = CalendarPopoverHeader(
+                monthNumber: 10, year: 2026, relativeOffsetLabel: label, nextRestDayCountdownLabel: nil,
+                dataCoverageNotice: "2027 年放假安排待更新", palette: palette,
+                onShowMonthPicker: {}, onPreviousMonth: {}, onGoToToday: {}, onNextMonth: {}, onShowSettings: {}
+            )
+            let host = NSHostingView(rootView: header.fixedSize())
+            host.layoutSubtreeIfNeeded()
+            return host.fittingSize.width
+        }
+        for width in widths {
+            XCTAssertEqual(width, widths[0], accuracy: 0.5, "\(widths)")
+        }
+    }
+
     func testUpcomingListHeightIsFixed() {
         let palette = CalendarPopoverTheme.palette(for: .light)
         let date = Calendar.gregorianChineseLocale.date(from: DateComponents(year: 2026, month: 10, day: 16))!
