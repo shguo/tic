@@ -90,18 +90,34 @@ private struct CalendarYiJiSummaryRow: View {
         HStack(spacing: 8) {
             CalendarYiJiBadge(label: label, tint: tint.opacity(0.8), size: 11, weight: .medium)
                 .frame(width: CalendarPopoverLayout.yiJiRowHeight, alignment: .leading)
-            // 按黄历原顺序能放几项放几项，始终只显示完整的词；完整列表点击查看
+            // 按黄历原顺序单行排列；放得下就原样显示，放不下时行尾渐隐，提示还有更多（点击查看完整列表）
             ViewThatFits(in: .horizontal) {
-                ForEach(Array(stride(from: items.count, through: 1, by: -1)), id: \.self) { count in
-                    Text(items.prefix(count).joined(separator: "  "))
-                        .font(.system(size: 11))
-                        .foregroundStyle(palette.secondaryText)
-                        .lineLimit(1)
-                        .fixedSize()
-                }
+                itemsText
+                // 放在 overlay 里，文字的理想宽度不参与布局，避免把卡片撑宽
+                Color.clear
+                    .frame(maxWidth: .infinity)
+                    .overlay(alignment: .leading) { itemsText }
+                    .clipped()
+                    .mask {
+                        HStack(spacing: 0) {
+                            Color.black
+                            LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
+                                .frame(width: Self.fadeWidth)
+                        }
+                    }
             }
         }
         .frame(height: CalendarPopoverLayout.yiJiRowHeight)
+    }
+
+    private static let fadeWidth: CGFloat = 36
+
+    private var itemsText: some View {
+        Text(items.joined(separator: "  "))
+            .font(.system(size: 11))
+            .foregroundStyle(palette.secondaryText)
+            .lineLimit(1)
+            .fixedSize()
     }
 }
 
