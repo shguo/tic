@@ -84,6 +84,7 @@ struct CalendarPopoverView: View {
                 year: displayedYear,
                 relativeOffsetLabel: relativeOffsetLabel,
                 nextRestDayCountdownLabel: nextRestDayCountdownLabel,
+                dataCoverageNotice: dataCoverageNotice,
                 palette: palette,
                 onShowMonthPicker: showMonthPicker,
                 onPreviousMonth: { shiftMonth(by: -1) },
@@ -98,10 +99,6 @@ struct CalendarPopoverView: View {
             .padding(.top, 8)
             .padding(.bottom, 16)
 
-            if let dataCoverageNotice {
-                dataCoverageBanner(dataCoverageNotice)
-            }
-
             CalendarWeekdayRow(palette: palette)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 12)
@@ -114,6 +111,7 @@ struct CalendarPopoverView: View {
                 subtitleRotationIndex: subtitleRotationIndex,
                 onSelectDate: selectDate
             )
+            .frame(height: CalendarPopoverLayout.maxGridHeight, alignment: .top)
             .padding(.horizontal, 8)
 
             CalendarDetailsSection(
@@ -254,27 +252,6 @@ struct CalendarPopoverView: View {
 
     private func showSettings() {
         SettingsWindowManager.show()
-    }
-
-    @ViewBuilder
-    private func dataCoverageBanner(_ text: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: "exclamationmark.circle")
-                .font(.system(size: 11, weight: .medium))
-            Text(text)
-                .font(.system(size: 11))
-            Spacer(minLength: 0)
-        }
-        .foregroundStyle(palette.secondaryText)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
-        .background(palette.controlBackground, in: RoundedRectangle(cornerRadius: 8))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8).strokeBorder(palette.controlBorder)
-        }
-        .padding(.horizontal, 20)
-        .padding(.bottom, 12)
-        .accessibilityElement(children: .combine)
     }
 
     private func setDisplayed(month: Int, year: Int) {
