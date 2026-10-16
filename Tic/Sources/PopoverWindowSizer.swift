@@ -5,7 +5,7 @@ import SwiftUI
 ///
 /// `MenuBarExtra` 默认在内容更新之后才按内容固有高度推算并改窗口尺寸，两者相差一两帧：
 /// 这期间内容在新旧尺寸的窗口里居中摆放，肉眼看到整个弹窗先下移再弹回。
-/// 现在由 `CalendarPopoverLayout.popoverHeight` 直接算出目标高度，内容显式定高，
+/// 现在由 `CalendarPopoverLayout.popoverHeight(showsYiJi:)` 直接算出目标高度，内容显式定高，
 /// 并在 SwiftUI 用新状态更新视图的同一次更新（`updateNSView`）里同步设置窗口尺寸。
 /// 系统随后按内容推算出的尺寸与之相同，不会再改动窗口。
 struct PopoverWindowSizer: NSViewRepresentable {

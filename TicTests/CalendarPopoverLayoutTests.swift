@@ -47,16 +47,36 @@ final class CalendarPopoverLayoutTests: XCTestCase {
     }
 
     func testPopoverHeightIsConstantAndMatchesLayout() {
-        // 覆盖 4 / 5 / 6 行自然行数的月份，以及缺调休数据的年份（2027）
+        // 覆盖 4 / 5 / 6 行自然行数的月份，以及缺调休数据的年份（2027）；宜忌开 / 关各一遍
         let calendar = Calendar.gregorianChineseLocale
-        for year in 2026...2027 {
-            for month in 1...12 {
-                let date = calendar.date(from: DateComponents(year: year, month: month, day: 15))!
-                let actual = fittingHeight(CalendarPopoverView(initialDate: date).fixedSize())
-                XCTAssertEqual(actual, CalendarPopoverLayout.popoverHeight, accuracy: 0.5, "\(year)-\(month)")
+        let defaults = UserDefaults.standard
+        let savedYiJi = defaults.object(forKey: AppSettings.showYiJiKey)
+        defer { defaults.set(savedYiJi, forKey: AppSettings.showYiJiKey) }
+
+        for showsYiJi in [true, false] {
+            defaults.set(showsYiJi, forKey: AppSettings.showYiJiKey)
+            let expected = CalendarPopoverLayout.popoverHeight(showsYiJi: showsYiJi)
+            for year in 2026...2027 {
+                for month in 1...12 {
+                    let date = calendar.date(from: DateComponents(year: year, month: month, day: 15))!
+                    let actual = fittingHeight(CalendarPopoverView(initialDate: date).fixedSize())
+                    XCTAssertEqual(actual, expected, accuracy: 0.5, "\(year)-\(month) 宜忌=\(showsYiJi)")
+                }
             }
         }
-        XCTAssertEqual(CalendarPopoverLayout.popoverHeight, 735)
+        XCTAssertEqual(CalendarPopoverLayout.popoverHeight(showsYiJi: false), 735)
+        XCTAssertEqual(CalendarPopoverLayout.popoverHeight(showsYiJi: true), 784)
+    }
+
+    func testDayYiJiComesFromAlmanac() {
+        let calendar = Calendar.gregorianChineseLocale
+        var date = calendar.date(from: DateComponents(year: 2026, month: 1, day: 1))!
+        for _ in 0..<365 {
+            let yiJi = ChineseCalendarSupport.dayYiJi(for: date)
+            XCTAssertFalse(yiJi.yi.isEmpty, "\(date)")
+            XCTAssertFalse(yiJi.ji.isEmpty, "\(date)")
+            date = calendar.date(byAdding: .day, value: 1, to: date)!
+        }
     }
 
     func testHeaderFitsWidestContent() {

@@ -6,7 +6,7 @@ enum CalendarPopoverLayout {
     // MARK: - 弹窗各区块尺寸（全部固定）
     //
     // 定制版：月历固定 6 行、「后续提醒」固定 3 行、缺数据提示放在标题行，
-    // 弹窗总高 `popoverHeight` 恒定，切换月份时窗口与各区块都不改变尺寸。
+    // 弹窗总高 `popoverHeight` 只取决于「显示宜忌」开关，切换月份时窗口与各区块都不改变尺寸。
     // 改动任何区块的字号 / 间距时同步改这里；`CalendarPopoverLayoutTests` 会校验与实际排版一致。
 
     static let gridRows = ChineseCalendarSupport.monthGridSlotCount / 7
@@ -25,6 +25,15 @@ enum CalendarPopoverLayout {
     static let detailsVerticalPadding: CGFloat = 10
     static let detailsCardSpacing: CGFloat = 12
     static let lunarCardHeight: CGFloat = 72
+    /// 农历卡片下方「宜 / 忌」两行：分隔线（上下各留 4）+ 两行 + 行距。
+    static let yiJiSeparatorSpacing: CGFloat = 4
+    static let yiJiRowHeight: CGFloat = 18
+    static let yiJiRowSpacing: CGFloat = 4
+    static let yiJiHeight = yiJiSeparatorSpacing * 2 + 1 + yiJiRowHeight * 2 + yiJiRowSpacing
+
+    static func lunarCardHeight(showsYiJi: Bool) -> CGFloat {
+        lunarCardHeight + (showsYiJi ? yiJiHeight : 0)
+    }
 
     static let upcomingRowHeight: CGFloat = 65
     static let upcomingDividerHeight: CGFloat = 1
@@ -33,14 +42,14 @@ enum CalendarPopoverLayout {
     static let upcomingListHeight = CGFloat(upcomingVisibleRows) * upcomingRowHeight
         + CGFloat(upcomingVisibleRows - 1) * upcomingDividerHeight
 
-    /// 弹窗总高（固定）。
-    static let popoverHeight: CGFloat = {
+    /// 弹窗总高（只随「显示宜忌」开关变化，切换月份 / 日期时不变）。
+    static func popoverHeight(showsYiJi: Bool) -> CGFloat {
         let header = headerTopPadding + headerHeight + headerBottomPadding
         let weekday = weekdayRowHeight + weekdayRowBottomPadding
-        let details = detailsTopSpacing + detailsVerticalPadding * 2 + lunarCardHeight + detailsCardSpacing
-            + upcomingListHeight
+        let details = detailsTopSpacing + detailsVerticalPadding * 2 + lunarCardHeight(showsYiJi: showsYiJi)
+            + detailsCardSpacing + upcomingListHeight
         return header + weekday + gridHeight + details
-    }()
+    }
 }
 
 enum CalendarPopoverTheme {

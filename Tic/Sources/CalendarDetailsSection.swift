@@ -3,11 +3,12 @@ import SwiftUI
 struct CalendarDetailsSection: View {
     let selectedDate: Date
     let upcomingEvents: [CalendarUpcomingEvent]
+    let showsYiJi: Bool
     let palette: CalendarPalette
 
     var body: some View {
         VStack(spacing: CalendarPopoverLayout.detailsCardSpacing) {
-            CalendarLunarCardView(selectedDate: selectedDate, palette: palette)
+            CalendarLunarCardView(selectedDate: selectedDate, showsYiJi: showsYiJi, palette: palette)
             CalendarUpcomingListView(events: upcomingEvents, palette: palette)
         }
         .padding(.horizontal, 8)

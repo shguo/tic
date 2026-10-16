@@ -11,6 +11,12 @@ struct DayAnnotation {
     var badge: DayBadge?
 }
 
+/// 黄历当日宜 / 忌（传统择日，仅供参考）。
+struct DayYiJi: Equatable {
+    let yi: [String]
+    let ji: [String]
+}
+
 enum ChineseCalendarSupport {
     private struct CalendarEventCandidate {
         let date: Date
@@ -192,6 +198,25 @@ enum ChineseCalendarSupport {
     static func lunarDetailMeta(for date: Date) -> String {
         "\(lunarYearLabel(for: date)) \(sexagenaryMonthLabel(for: date))月 \(sexagenaryDayLabel(for: date))日"
     }
+
+    /// 宜忌由 LunarSwift 按「月干支 × 日干支」查《协纪辨方书》预编码表得出；无条目时为 ["无"]。
+    @MainActor
+    static func dayYiJi(for date: Date) -> DayYiJi {
+        let key = dateKey(date)
+        if let cached = yiJiCache[key] {
+            return cached
+        }
+        let lunar = lunarDay(for: date)
+        let result = DayYiJi(yi: lunar.dayYi, ji: lunar.dayJi)
+        if yiJiCache.count >= 400 {
+            yiJiCache.removeAll()
+        }
+        yiJiCache[key] = result
+        return result
+    }
+
+    /// 查表要对整张宜忌表跑正则；弹窗每 3 秒轮播副标题会重算视图，按日缓存避免重复计算。
+    @MainActor private static var yiJiCache: [String: DayYiJi] = [:]
 
     static func weekOfYear(for date: Date) -> Int {
         gregorian.component(.weekOfYear, from: date)
@@ -377,11 +402,17 @@ enum ChineseCalendarSupport {
     }
 
     private static func sexagenaryDayLabel(for date: Date) -> String {
-        let day = gregorian.startOfDay(for: date)
-        let year = gregorian.component(.year, from: day)
-        let month = gregorian.component(.month, from: day)
-        let dayOfMonth = gregorian.component(.day, from: day)
-        return Solar.fromYmdHms(year: year, month: month, day: dayOfMonth).lunar.dayInGanZhi
+        lunarDay(for: date).dayInGanZhi
+    }
+
+    /// 北京时间当日对应的 LunarSwift 农历日。
+    private static func lunarDay(for date: Date) -> Lunar {
+        let components = gregorian.dateComponents([.year, .month, .day], from: date)
+        return Solar.fromYmdHms(
+            year: components.year ?? 0,
+            month: components.month ?? 1,
+            day: components.day ?? 1
+        ).lunar
     }
 
     private static func solarMonthBranchIndex(for date: Date, in year: Int) -> Int {

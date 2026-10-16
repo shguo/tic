@@ -16,6 +16,7 @@ struct CalendarPopoverView: View {
     @AppStorage(AppSettings.appThemeKey) private var appThemeRaw = AppTheme.system.rawValue
     @AppStorage(AppSettings.showAnnotationDotsKey) private var showAnnotationDots = AppSettings.showAnnotationDotsDefault
     @AppStorage(AppSettings.showSolarTermsKey) private var showSolarTerms = true
+    @AppStorage(AppSettings.showYiJiKey) private var showYiJi = true
 
     private let calendar: Calendar = {
         var calendar = Calendar(identifier: .gregorian)
@@ -72,8 +73,8 @@ struct CalendarPopoverView: View {
             : nil
     }
 
-    /// 弹窗总高（定制版固定）；内容与窗口都按它定高。
-    private var popoverHeight: CGFloat { CalendarPopoverLayout.popoverHeight }
+    /// 弹窗总高（定制版固定，仅随「显示宜忌」开关变化）；内容与窗口都按它定高。
+    private var popoverHeight: CGFloat { CalendarPopoverLayout.popoverHeight(showsYiJi: showYiJi) }
 
     private var relativeOffsetLabel: String? {
         let label = ChineseCalendarSupport.relativeDayLabel(for: selectedDate)
@@ -125,6 +126,7 @@ struct CalendarPopoverView: View {
             CalendarDetailsSection(
                 selectedDate: selectedDate,
                 upcomingEvents: upcomingEvents,
+                showsYiJi: showYiJi,
                 palette: palette
             )
             .padding(.top, CalendarPopoverLayout.detailsTopSpacing)

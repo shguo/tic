@@ -4,6 +4,7 @@ import AppKit
 final class CalendarSettingsViewController: SettingsPaneViewController {
     private let dotsSwitch = NSSwitch()
     private let termsSwitch = NSSwitch()
+    private let yiJiSwitch = NSSwitch()
     init() { super.init(title: "日历") }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
@@ -16,6 +17,10 @@ final class CalendarSettingsViewController: SettingsPaneViewController {
         termsSwitch.target = self
         termsSwitch.action = #selector(termsChanged)
 
+        yiJiSwitch.state = AppSettings.bool(forKey: AppSettings.showYiJiKey, default: true) ? .on : .off
+        yiJiSwitch.target = self
+        yiJiSwitch.action = #selector(yiJiChanged)
+
         let dotsRow = makeSettingsRow(
             title: "显示标注圆点",
             subtitle: "节假日、节气等有标注的日期在月历格底部显示圆点",
@@ -26,7 +31,12 @@ final class CalendarSettingsViewController: SettingsPaneViewController {
             subtitle: "月历副标题与详情中显示节气名称（如立夏）",
             control: termsSwitch
         )
-        return [makeSettingsGroupedCard([dotsRow, termsRow])]
+        let yiJiRow = makeSettingsRow(
+            title: "显示宜忌",
+            subtitle: "农历详情下方显示当日宜 / 忌，点击查看完整列表",
+            control: yiJiSwitch
+        )
+        return [makeSettingsGroupedCard([dotsRow, termsRow, yiJiRow])]
     }
 
     override func makeFooter() -> NSView? {
@@ -39,6 +49,10 @@ final class CalendarSettingsViewController: SettingsPaneViewController {
 
     @objc private func termsChanged() {
         AppSettings.setBool(termsSwitch.state == .on, forKey: AppSettings.showSolarTermsKey)
+    }
+
+    @objc private func yiJiChanged() {
+        AppSettings.setBool(yiJiSwitch.state == .on, forKey: AppSettings.showYiJiKey)
     }
 
 }
