@@ -6,35 +6,31 @@ struct CalendarUpcomingRowView: View {
 
     private let calendar = Calendar(identifier: .gregorian)
 
-    /// 与月历日期格同色：节日红、节气绿。
-    private var kindTag: (text: String, color: Color)? {
+    /// 左侧色条颜色，与月历日期格同色：节日红、节气绿。
+    private var kindColor: Color? {
         switch event.kind {
-        case .festival: ("节日", palette.festivalText)
-        case .solarTerm: ("节气", palette.solarTermText)
+        case .festival: palette.festivalText
+        case .solarTerm: palette.solarTermText
         case .lunarDay, .lunarMonthStart: nil
         }
     }
 
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(alignment: .center, spacing: 6) {
-                    Text(event.title)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(palette.primaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.82)
+            if let kindColor {
+                RoundedRectangle(cornerRadius: 1.5, style: .continuous)
+                    .fill(kindColor)
+                    .frame(width: 3, height: 34)
+                    .padding(.trailing, -6)
+                    .accessibilityHidden(true)
+            }
 
-                    if let kindTag {
-                        Text(kindTag.text)
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundStyle(kindTag.color)
-                            .fixedSize()
-                            .padding(.horizontal, 5)
-                            .frame(height: 16)
-                            .background(kindTag.color.opacity(0.12), in: RoundedRectangle(cornerRadius: 4, style: .continuous))
-                    }
-                }
+            VStack(alignment: .leading, spacing: 4) {
+                Text(event.title)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(palette.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
 
                 Text(event.dateLabel)
                     .font(.system(size: 12))
