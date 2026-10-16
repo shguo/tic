@@ -6,9 +6,9 @@ struct TicApp: App {
 
     var body: some Scene {
         MenuBarExtra {
+            // 宽高由 CalendarPopoverView 按布局常量显式给出，窗口尺寸见 PopoverWindowSizer。
             CalendarPopoverView()
-                .frame(width: CalendarPopoverLayout.width)
-                .fixedSize(horizontal: false, vertical: true)
+                .fixedSize()
         } label: {
             MenuBarDateLabel()
         }

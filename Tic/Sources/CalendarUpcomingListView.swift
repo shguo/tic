@@ -11,7 +11,7 @@ struct CalendarUpcomingListView: View {
                     .font(.system(size: 14))
                     .foregroundStyle(palette.secondaryText)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .frame(height: 65)
+                    .frame(height: CalendarPopoverLayout.upcomingRowHeight)
                     .padding(.horizontal, 18)
             } else {
                 ForEach(events) { event in
@@ -19,11 +19,13 @@ struct CalendarUpcomingListView: View {
                     if event.id != events.last?.id {
                         Divider()
                             .overlay(palette.separator)
+                            .frame(height: CalendarPopoverLayout.upcomingDividerHeight)
                             .padding(.leading, 20)
                     }
                 }
             }
         }
+        .frame(height: CalendarPopoverLayout.upcomingListHeight(eventCount: events.count), alignment: .top)
         .background(palette.cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .shadow(color: palette.shadow, radius: 0, x: 0, y: 1)
     }

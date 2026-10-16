@@ -19,7 +19,7 @@ struct CalendarLunarCardView: View {
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 10)
-        .frame(height: 72)
+        .frame(height: CalendarPopoverLayout.lunarCardHeight)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(palette.cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .shadow(color: palette.shadow, radius: 0, x: 0, y: 1)

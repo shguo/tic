@@ -32,9 +32,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             disableFocusRing(in: contentView)
         }
 
-        MenuBarPopoverWindowAnchor.shared.beginObserving(window)
-        MenuBarPopoverWindowAnchor.shared.refreshAnchor(for: window)
-
         NotificationCenter.default.addObserver(
             forName: NSWindow.willCloseNotification,
             object: window,

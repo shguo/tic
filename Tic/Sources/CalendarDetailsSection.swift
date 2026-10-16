@@ -6,13 +6,12 @@ struct CalendarDetailsSection: View {
     let palette: CalendarPalette
 
     var body: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: CalendarPopoverLayout.detailsCardSpacing) {
             CalendarLunarCardView(selectedDate: selectedDate, palette: palette)
             CalendarUpcomingListView(events: upcomingEvents, palette: palette)
         }
         .padding(.horizontal, 8)
-        .padding(.top, 10)
-        .padding(.bottom, 10)
+        .padding(.vertical, CalendarPopoverLayout.detailsVerticalPadding)
         .frame(maxWidth: .infinity, alignment: .top)
         .background(palette.detailsBackground)
         .accessibilityElement(children: .contain)
