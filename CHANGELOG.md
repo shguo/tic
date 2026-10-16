@@ -5,6 +5,8 @@
 
 ## [Unreleased]
 
+## [1.3.7] - 2026-10-16
+
 ### 定制版（shguo/tic）
 
 - 月历日期格按类型着色：节日 / 法定假日名红色、节气绿色、农历日灰色，节日与节气文字略加粗；农历初一改为显示月名（如「九月」「闰二月」）
@@ -194,7 +196,8 @@
 - 登录时自动启动
 - macOS 应用图标
 
-[Unreleased]: https://github.com/shguo/tic/compare/v1.3.6...HEAD
+[Unreleased]: https://github.com/shguo/tic/compare/v1.3.7...HEAD
+[1.3.7]: https://github.com/shguo/tic/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/shguo/tic/compare/v1.3.5...v1.3.6
 [1.3.5]: https://github.com/shguo/tic/compare/v1.3.4...v1.3.5
 [1.3.4]: https://github.com/shguo/tic/compare/v1.3.3...v1.3.4
