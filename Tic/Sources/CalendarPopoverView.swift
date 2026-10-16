@@ -35,7 +35,7 @@ struct CalendarPopoverView: View {
         _monthSlots = State(initialValue: ChineseCalendarSupport.monthSlots(for: initialDay, showSolarTerms: usesSolarTerms))
         _upcomingEvents = State(initialValue: ChineseCalendarSupport.upcomingEvents(
             from: initialDay,
-            limit: 3,
+            limit: Self.upcomingEventLimit,
             includeSolarTerms: usesSolarTerms
         ))
     }
@@ -305,10 +305,13 @@ struct CalendarPopoverView: View {
         dataCache.monthSlots(for: month, showSolarTerms: showSolarTerms, calendar: calendar)
     }
 
+    /// 「后续提醒」可滚动，取查找窗口（约一年）内的全部节日 / 节气，可见区域仍为 3 行。
+    private static let upcomingEventLimit = Int.max
+
     private func upcomingEvents(from date: Date) -> [CalendarUpcomingEvent] {
         dataCache.upcomingEvents(
             from: date,
-            limit: 3,
+            limit: Self.upcomingEventLimit,
             includeSolarTerms: showSolarTerms,
             calendar: calendar
         )

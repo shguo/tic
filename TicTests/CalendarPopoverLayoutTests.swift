@@ -95,9 +95,9 @@ final class CalendarPopoverLayoutTests: XCTestCase {
     func testUpcomingListHeightIsFixed() {
         let palette = CalendarPopoverTheme.palette(for: .light)
         let date = Calendar.gregorianChineseLocale.date(from: DateComponents(year: 2026, month: 10, day: 16))!
-        let events = ChineseCalendarSupport.upcomingEvents(from: date, limit: 3, includeSolarTerms: true)
-        XCTAssertEqual(events.count, 3)
-        for count in 0...3 {
+        let events = ChineseCalendarSupport.upcomingEvents(from: date, limit: .max, includeSolarTerms: true)
+        XCTAssertGreaterThan(events.count, 30, "一年内的节日 / 节气应全部可滚动查看")
+        for count in [0, 1, 2, 3, 10, events.count] {
             let list = CalendarUpcomingListView(events: Array(events.prefix(count)), palette: palette)
                 .frame(width: CalendarPopoverLayout.width)
             XCTAssertEqual(fittingHeight(list), CalendarPopoverLayout.upcomingListHeight, accuracy: 0.5, "events=\(count)")
