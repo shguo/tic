@@ -8,7 +8,7 @@ final class CalendarSettingsViewController: SettingsPaneViewController {
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     override func makeContent() -> [NSView] {
-        dotsSwitch.state = AppSettings.bool(forKey: AppSettings.showAnnotationDotsKey, default: true) ? .on : .off
+        dotsSwitch.state = AppSettings.bool(forKey: AppSettings.showAnnotationDotsKey, default: AppSettings.showAnnotationDotsDefault) ? .on : .off
         dotsSwitch.target = self
         dotsSwitch.action = #selector(dotsChanged)
 

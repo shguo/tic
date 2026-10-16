@@ -63,6 +63,8 @@ enum CalendarPopoverTheme {
                 restBadge: Color.accentColor,
                 workBadge: Color(red: 1.0, green: 0.48, blue: 0.10),
                 dot: Color(red: 0.42, green: 0.42, blue: 0.45),
+                festivalText: Color(red: 1.0, green: 0.45, blue: 0.42),
+                solarTermText: Color(red: 0.38, green: 0.80, blue: 0.52),
                 separator: Color.white.opacity(0.10),
                 shadow: Color.black.opacity(0.20)
             )
@@ -83,6 +85,8 @@ enum CalendarPopoverTheme {
                 restBadge: Color.accentColor,
                 workBadge: Color(red: 1.0, green: 0.48, blue: 0.10),
                 dot: Color(red: 0.73, green: 0.73, blue: 0.74),
+                festivalText: Color(red: 0.86, green: 0.20, blue: 0.18),
+                solarTermText: Color(red: 0.10, green: 0.56, blue: 0.30),
                 separator: Color.black.opacity(0.08),
                 shadow: Color.black.opacity(0.05)
             )

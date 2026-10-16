@@ -9,7 +9,7 @@ struct CalendarDayCellView: View {
     let isSelected: Bool
     let palette: CalendarPalette
     let showAnnotationDot: Bool
-    let subtitle: String
+    let subtitle: DaySubtitle
     let badge: DayBadge?
     /// 为 false 时是首尾补齐的上月 / 下月日期：整格淡化显示，点击会跳到该月。
     let isInDisplayedMonth: Bool
@@ -26,8 +26,8 @@ struct CalendarDayCellView: View {
                             .monospacedDigit()
                             .contentTransition(.numericText())
 
-                        Text(subtitle)
-                            .font(.system(size: Self.subtitleFontSize))
+                        Text(subtitle.text)
+                            .font(.system(size: Self.subtitleFontSize, weight: subtitleWeight))
                             .foregroundStyle(subtitleTextColor)
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
@@ -94,7 +94,20 @@ struct CalendarDayCellView: View {
     }
 
     private var subtitleTextColor: Color {
-        isToday ? Color.white.opacity(0.94) : palette.secondaryText
+        if isToday { return Color.white.opacity(0.94) }
+        // 节日红、节气绿、农历灰：扫一眼即可区分，不必再靠底部圆点
+        switch subtitle.kind {
+        case .festival: return palette.festivalText
+        case .solarTerm: return palette.solarTermText
+        case .lunarDay, .lunarMonthStart: return palette.secondaryText
+        }
+    }
+
+    private var subtitleWeight: Font.Weight {
+        switch subtitle.kind {
+        case .festival, .solarTerm, .lunarMonthStart: return .medium
+        case .lunarDay: return .regular
+        }
     }
 
     private var dotColor: Color {
@@ -102,7 +115,7 @@ struct CalendarDayCellView: View {
     }
 
     private var accessibilityLabel: String {
-        "\(monthNumber)月\(dayNumber)日，\(subtitle)"
+        "\(monthNumber)月\(dayNumber)日，\(subtitle.text)"
     }
 }
 

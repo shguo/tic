@@ -108,6 +108,22 @@ final class TicTests: XCTestCase {
         XCTAssertFalse(oct2.contains("国庆节"))
     }
 
+    func testCellSubtitleKinds() {
+        func subtitle(_ y: Int, _ m: Int, _ d: Int) -> DaySubtitle? {
+            let date = gregorianDate(y, m, d)
+            return ChineseCalendarSupport.monthSlots(for: date, showSolarTerms: true)
+                .first { $0.isInDisplayedMonth && Calendar.gregorianChineseLocale.isDate($0.date, inSameDayAs: date) }?
+                .subtitles.first
+        }
+        XCTAssertEqual(subtitle(2026, 10, 1), DaySubtitle(text: "国庆节", kind: .festival))
+        XCTAssertEqual(subtitle(2026, 10, 8), DaySubtitle(text: "寒露", kind: .solarTerm))
+        XCTAssertEqual(subtitle(2026, 10, 18), DaySubtitle(text: "重阳", kind: .festival))
+        XCTAssertEqual(subtitle(2026, 10, 16), DaySubtitle(text: "初七", kind: .lunarDay))
+        // 农历月首显示月名，闰月带「闰」
+        XCTAssertEqual(subtitle(2026, 10, 10), DaySubtitle(text: "九月", kind: .lunarMonthStart))
+        XCTAssertEqual(subtitle(2023, 3, 22), DaySubtitle(text: "闰二月", kind: .lunarMonthStart))
+    }
+
     // MARK: - 版本比较（检查更新）
 
     // MARK: - 检查更新：API 限流降级

@@ -21,6 +21,10 @@ struct CalendarPalette {
     let restBadge: Color
     let workBadge: Color
     let dot: Color
+    /// 日期格中节日 / 法定假日名
+    let festivalText: Color
+    /// 日期格中节气名
+    let solarTermText: Color
     let separator: Color
     let shadow: Color
 }

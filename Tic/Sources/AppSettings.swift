@@ -68,6 +68,8 @@ enum AppSettings {
     static let menuBarBlockOrderKey = "menuBarBlockOrder"
     static let menuBarEnabledBlocksKey = "menuBarEnabledBlocks"
     static let showAnnotationDotsKey = "showAnnotationDots"
+    /// 节日 / 节气已按颜色区分，标注圆点默认关闭（仍可在设置中打开）。
+    static let showAnnotationDotsDefault = false
     static let showSolarTermsKey = "showSolarTerms"
     static let launchAtLoginKey = "launchAtLogin"
     static let legacyDateFormatStyleKey = "dateFormatStyle"

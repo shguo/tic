@@ -14,7 +14,7 @@ struct CalendarPopoverView: View {
     @Environment(\.colorScheme) private var systemColorScheme
 
     @AppStorage(AppSettings.appThemeKey) private var appThemeRaw = AppTheme.system.rawValue
-    @AppStorage(AppSettings.showAnnotationDotsKey) private var showAnnotationDots = true
+    @AppStorage(AppSettings.showAnnotationDotsKey) private var showAnnotationDots = AppSettings.showAnnotationDotsDefault
     @AppStorage(AppSettings.showSolarTermsKey) private var showSolarTerms = true
 
     private let calendar: Calendar = {

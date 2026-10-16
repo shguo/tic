@@ -108,35 +108,35 @@ enum ChineseCalendarSupport {
     }
 
     static func cellSubtitles(for date: Date, showSolarTerms: Bool = true) -> [String] {
-        dayCellMetadata(for: date, showSolarTerms: showSolarTerms).subtitles
+        dayCellMetadata(for: date, showSolarTerms: showSolarTerms).subtitles.map(\.text)
     }
 
     private static func dayCellMetadata(
         for date: Date,
         showSolarTerms: Bool
-    ) -> (subtitles: [String], hasAnnotation: Bool, badge: DayBadge?) {
-        var subtitles: [String] = []
+    ) -> (subtitles: [DaySubtitle], hasAnnotation: Bool, badge: DayBadge?) {
+        var subtitles: [DaySubtitle] = []
         let ann = storedAnnotation(for: date)
         let solarTerm = showSolarTerms ? SolarTermSupport.name(for: date) : nil
         let festival = solarFestival(for: date)
         let lunarFest = lunarFestival(for: date)
 
         if let term = solarTerm {
-            subtitles.append(term)
+            subtitles.append(DaySubtitle(text: term, kind: .solarTerm))
         }
         if let festival = festival?.cellTitle {
-            subtitles.append(festival)
+            subtitles.append(DaySubtitle(text: festival, kind: .festival))
         }
         if let lunarFest = lunarFest?.cellTitle {
-            subtitles.append(lunarFest)
+            subtitles.append(DaySubtitle(text: lunarFest, kind: .festival))
         }
         if let subtitle = ann?.subtitle,
            ann?.badge != .rest || isFirstAnnotatedHoliday(date, subtitle: subtitle) {
-            subtitles.append(subtitle)
+            subtitles.append(DaySubtitle(text: subtitle, kind: .festival))
         }
 
-        let unique = subtitles.reduce(into: [String]()) { result, subtitle in
-            if !result.contains(subtitle) {
+        let unique = subtitles.reduce(into: [DaySubtitle]()) { result, subtitle in
+            if !result.contains(where: { $0.text == subtitle.text }) {
                 result.append(subtitle)
             }
         }
@@ -147,7 +147,7 @@ enum ChineseCalendarSupport {
             || lunarFest != nil
 
         return (
-            subtitles: unique.isEmpty ? [lunarDayLabel(for: date)] : unique,
+            subtitles: unique.isEmpty ? [lunarCellSubtitle(for: date)] : unique,
             hasAnnotation: hasAnnotation,
             badge: ann?.badge
         )
@@ -326,6 +326,16 @@ enum ChineseCalendarSupport {
                 isInDisplayedMonth: gregorian.isDate(date, equalTo: firstOfMonth, toGranularity: .month)
             )
         }
+    }
+
+    /// 无节日 / 节气时的农历文字：月首显示月名（「九月」「闰六月」），其余显示农历日。
+    private static func lunarCellSubtitle(for date: Date) -> DaySubtitle {
+        let components = chinese.dateComponents([.month, .day], from: date)
+        guard components.day == 1, let month = components.month else {
+            return DaySubtitle(text: lunarDayLabel(for: date), kind: .lunarDay)
+        }
+        let leapPrefix = components.isLeapMonth == true ? "闰" : ""
+        return DaySubtitle(text: leapPrefix + (lunarMonthNames[safe: month - 1] ?? "\(month)月"), kind: .lunarMonthStart)
     }
 
     private static func lunarDayLabel(for date: Date) -> String {
