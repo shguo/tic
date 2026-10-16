@@ -11,7 +11,6 @@ struct CalendarDayCellView: View {
     let showAnnotationDot: Bool
     let subtitle: String
     let badge: DayBadge?
-    let cellHeight: CGFloat
     /// 为 false 时是首尾补齐的上月 / 下月日期：整格淡化显示，点击会跳到该月。
     let isInDisplayedMonth: Bool
     let onSelect: () -> Void
@@ -20,33 +19,32 @@ struct CalendarDayCellView: View {
         Button(action: onSelect) {
             ZStack(alignment: .topTrailing) {
                 ZStack(alignment: .bottom) {
-                    VStack(spacing: cellSpacing) {
+                    VStack(spacing: 0) {
                         Text(String(dayNumber))
-                            .font(.system(size: dayNumberFontSize, weight: .semibold))
+                            .font(.system(size: Self.dayNumberFontSize, weight: .semibold))
                             .foregroundStyle(dayTextColor)
                             .monospacedDigit()
                             .contentTransition(.numericText())
 
                         Text(subtitle)
-                            .font(.system(size: subtitleFontSize))
+                            .font(.system(size: Self.subtitleFontSize))
                             .foregroundStyle(subtitleTextColor)
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
-                            .frame(height: subtitleHeight)
+                            .frame(height: Self.subtitleHeight)
                     }
                     .frame(maxWidth: .infinity)
-                    .padding(.top, contentTopPadding)
                     .frame(maxHeight: .infinity, alignment: .top)
 
                     if showAnnotationDot {
                         Circle()
                             .fill(dotColor)
                             .frame(width: 4, height: 4)
-                            .padding(.bottom, dotBottomPadding)
+                            .padding(.bottom, Self.dotBottomPadding)
                     }
                 }
                 .frame(maxWidth: .infinity)
-                .frame(height: cellHeight)
+                .frame(height: CalendarPopoverLayout.gridCellHeight)
                 .background(cellBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
                 .overlay {
                     RoundedRectangle(cornerRadius: 10, style: .continuous)
@@ -74,29 +72,11 @@ struct CalendarDayCellView: View {
 
     private static let outsideMonthOpacity: CGFloat = 0.35
 
-    private var contentTopPadding: CGFloat {
-        cellHeight < 50 ? 0 : 5
-    }
-
-    private var cellSpacing: CGFloat {
-        cellHeight < 50 ? 0 : 3
-    }
-
-    private var dayNumberFontSize: CGFloat {
-        cellHeight < 50 ? 20 : 22
-    }
-
-    private var subtitleFontSize: CGFloat {
-        cellHeight < 50 ? 11 : 12
-    }
-
-    private var subtitleHeight: CGFloat {
-        cellHeight < 50 ? 12 : 13
-    }
-
-    private var dotBottomPadding: CGFloat {
-        cellHeight < 50 ? 3 : 4
-    }
+    // 格高固定为 `CalendarPopoverLayout.gridCellHeight`（46pt），以下尺寸按它排布。
+    private static let dayNumberFontSize: CGFloat = 20
+    private static let subtitleFontSize: CGFloat = 11
+    private static let subtitleHeight: CGFloat = 12
+    private static let dotBottomPadding: CGFloat = 3
 
     private var cellBackground: Color {
         if isToday { return palette.accent }
@@ -138,7 +118,6 @@ extension CalendarDayCellView: Equatable {
             && lhs.showAnnotationDot == rhs.showAnnotationDot
             && lhs.subtitle == rhs.subtitle
             && lhs.badge == rhs.badge
-            && lhs.cellHeight == rhs.cellHeight
             && lhs.isInDisplayedMonth == rhs.isInDisplayedMonth
     }
 }

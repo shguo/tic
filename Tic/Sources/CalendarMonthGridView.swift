@@ -11,47 +11,27 @@ struct CalendarMonthGridView: View {
     private let calendar = Calendar(identifier: .gregorian)
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
 
-    private var rowCount: Int {
-        CalendarPopoverLayout.gridRowCount(slotCount: slots.count)
-    }
-
-    private var rowSpacing: CGFloat {
-        rowCount > 5 ? CalendarPopoverLayout.sixRowSpacing : CalendarPopoverLayout.fiveRowSpacing
-    }
-
-    private var cellHeight: CGFloat {
-        rowCount > 5 ? CalendarPopoverLayout.sixRowCellHeight : CalendarPopoverLayout.fiveRowCellHeight
-    }
-
     var body: some View {
         let selectedDayID = dayID(for: selectedDate)
         let todayID = dayID(for: .now)
 
-        LazyVGrid(columns: columns, spacing: rowSpacing) {
+        LazyVGrid(columns: columns, spacing: CalendarPopoverLayout.gridRowSpacing) {
             ForEach(slots) { slot in
-                if let date = slot.date {
-                    let subtitle = slot.subtitle(rotationIndex: subtitleRotationIndex)
-                    CalendarDayCellView(
-                        date: date,
-                        monthNumber: slot.monthNumber,
-                        dayNumber: slot.dayNumber,
-                        isToday: slot.id == todayID,
-                        isWeekend: slot.isWeekend,
-                        isSelected: slot.id == selectedDayID,
-                        palette: palette,
-                        showAnnotationDot: showAnnotationDots && slot.hasAnnotation,
-                        subtitle: subtitle,
-                        badge: slot.badge,
-                        cellHeight: cellHeight,
-                        isInDisplayedMonth: slot.isInDisplayedMonth,
-                        onSelect: { onSelectDate(date) }
-                    )
-                    .equatable()
-                } else {
-                    Color.clear
-                        .frame(height: cellHeight)
-                        .accessibilityHidden(true)
-                }
+                CalendarDayCellView(
+                    date: slot.date,
+                    monthNumber: slot.monthNumber,
+                    dayNumber: slot.dayNumber,
+                    isToday: slot.id == todayID,
+                    isWeekend: slot.isWeekend,
+                    isSelected: slot.id == selectedDayID,
+                    palette: palette,
+                    showAnnotationDot: showAnnotationDots && slot.hasAnnotation,
+                    subtitle: slot.subtitle(rotationIndex: subtitleRotationIndex),
+                    badge: slot.badge,
+                    isInDisplayedMonth: slot.isInDisplayedMonth,
+                    onSelect: { onSelectDate(slot.date) }
+                )
+                .equatable()
             }
         }
     }

@@ -2,7 +2,7 @@ import Foundation
 
 struct CalendarMonthSlot: Identifiable {
     let id: String
-    let date: Date?
+    let date: Date
     let monthNumber: Int
     let dayNumber: Int
     let isWeekend: Bool

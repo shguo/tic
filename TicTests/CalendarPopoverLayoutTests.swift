@@ -33,8 +33,7 @@ final class CalendarPopoverLayoutTests: XCTestCase {
             for month in 1...12 {
                 let date = calendar.date(from: DateComponents(year: year, month: month, day: 15))!
                 let slots = ChineseCalendarSupport.monthSlots(for: date, showSolarTerms: true)
-                let dates = slots.compactMap(\.date)
-                XCTAssertEqual(dates.count, slots.count, "\(year)-\(month)")
+                let dates = slots.map(\.date)
                 XCTAssertEqual(calendar.component(.weekday, from: dates[0]), 2, "首格应为周一 \(year)-\(month)")
                 for (prev, next) in zip(dates, dates.dropFirst()) {
                     XCTAssertEqual(calendar.dateComponents([.day], from: prev, to: next).day, 1, "\(year)-\(month)")

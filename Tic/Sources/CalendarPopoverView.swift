@@ -62,7 +62,7 @@ struct CalendarPopoverView: View {
 
     /// 网格当前展示的年份。与 `displayedYear` 不同，它随 `monthSlots` 一步到位更新，不参与数字滚动动画。
     private var gridYear: Int {
-        monthSlots.lazy.filter(\.isInDisplayedMonth).compactMap(\.date).first.map { calendar.component(.year, from: $0) } ?? displayedYear
+        monthSlots.first(where: \.isInDisplayedMonth).map { calendar.component(.year, from: $0.date) } ?? displayedYear
     }
 
     /// 当前查看年份缺少内置法定调休数据时的非阻断提示（随翻年自动更新）。

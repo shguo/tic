@@ -3,23 +3,6 @@ import SwiftUI
 enum CalendarPopoverLayout {
     static let width: CGFloat = 397
 
-    static let fiveRowCellHeight: CGFloat = 55
-    static let fiveRowSpacing: CGFloat = 17
-    static let sixRowCellHeight: CGFloat = 46
-    static let sixRowSpacing: CGFloat = 10
-
-    static func gridHeight(rowCount: Int) -> CGFloat {
-        guard rowCount > 0 else { return 0 }
-        if rowCount > 5 {
-            return CGFloat(rowCount) * sixRowCellHeight + CGFloat(rowCount - 1) * sixRowSpacing
-        }
-        return CGFloat(rowCount) * fiveRowCellHeight + CGFloat(rowCount - 1) * fiveRowSpacing
-    }
-
-    static func gridRowCount(slotCount: Int) -> Int {
-        Int(ceil(Double(slotCount) / 7.0))
-    }
-
     // MARK: - 弹窗各区块尺寸（全部固定）
     //
     // 定制版：月历固定 6 行、「后续提醒」固定 3 行、缺数据提示放在标题行，
@@ -27,7 +10,9 @@ enum CalendarPopoverLayout {
     // 改动任何区块的字号 / 间距时同步改这里；`CalendarPopoverLayoutTests` 会校验与实际排版一致。
 
     static let gridRows = ChineseCalendarSupport.monthGridSlotCount / 7
-    static let fixedGridHeight = gridHeight(rowCount: gridRows)
+    static let gridCellHeight: CGFloat = 46
+    static let gridRowSpacing: CGFloat = 10
+    static let gridHeight = CGFloat(gridRows) * gridCellHeight + CGFloat(gridRows - 1) * gridRowSpacing
 
     static let headerTopPadding: CGFloat = 8
     static let headerHeight: CGFloat = 40
@@ -54,7 +39,7 @@ enum CalendarPopoverLayout {
         let weekday = weekdayRowHeight + weekdayRowBottomPadding
         let details = detailsTopSpacing + detailsVerticalPadding * 2 + lunarCardHeight + detailsCardSpacing
             + upcomingListHeight
-        return header + weekday + fixedGridHeight + details
+        return header + weekday + gridHeight + details
     }()
 }
 
