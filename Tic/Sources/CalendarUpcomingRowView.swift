@@ -6,7 +6,7 @@ struct CalendarUpcomingRowView: View {
 
     private let calendar = Calendar(identifier: .gregorian)
 
-    /// 左侧色条颜色，与月历日期格同色：节日红、节气绿。
+    /// 标题颜色，与月历日期格同色：节日红、节气绿。
     private var kindColor: Color? {
         switch event.kind {
         case .festival: palette.festivalText
@@ -17,18 +17,10 @@ struct CalendarUpcomingRowView: View {
 
     var body: some View {
         HStack(alignment: .center, spacing: 16) {
-            if let kindColor {
-                RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-                    .fill(kindColor)
-                    .frame(width: 3, height: 34)
-                    .padding(.trailing, -6)
-                    .accessibilityHidden(true)
-            }
-
             VStack(alignment: .leading, spacing: 4) {
                 Text(event.title)
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(palette.primaryText)
+                    .foregroundStyle(kindColor ?? palette.primaryText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.82)
 
