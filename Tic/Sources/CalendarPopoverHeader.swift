@@ -5,8 +5,6 @@ struct CalendarPopoverHeader: View {
     let year: Int
     let relativeOffsetLabel: String?
     let nextRestDayCountdownLabel: String?
-    /// 当前查看年份缺少内置调休数据时的提示；以小图标 + 悬停提示显示，不占额外行高。
-    let dataCoverageNotice: String?
     let palette: CalendarPalette
     let onShowMonthPicker: () -> Void
     let onPreviousMonth: () -> Void
@@ -35,14 +33,6 @@ struct CalendarPopoverHeader: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("选择年份")
-
-                if let dataCoverageNotice {
-                    Image(systemName: "exclamationmark.circle")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundStyle(palette.secondaryText)
-                        .help(dataCoverageNotice)
-                        .accessibilityLabel(dataCoverageNotice)
-                }
 
                 if let relativeOffsetLabel {
                     Text(relativeOffsetLabel)

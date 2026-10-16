@@ -5,9 +5,8 @@ enum CalendarPopoverLayout {
 
     static let fiveRowCellHeight: CGFloat = 55
     static let fiveRowSpacing: CGFloat = 17
-    /// 6 行格子与行距取值使网格总高与 5 行相同（6×48+5×11 = 5×55+4×17 = 343），切换月份时弹窗高度不变。
-    static let sixRowCellHeight: CGFloat = 48
-    static let sixRowSpacing: CGFloat = 11
+    static let sixRowCellHeight: CGFloat = 46
+    static let sixRowSpacing: CGFloat = 10
 
     static func gridHeight(rowCount: Int) -> CGFloat {
         guard rowCount > 0 else { return 0 }
@@ -20,9 +19,6 @@ enum CalendarPopoverLayout {
     static let maxGridHeight = max(gridHeight(rowCount: 5), gridHeight(rowCount: 6))
 
     static let upcomingRowHeight: CGFloat = 65
-    static let upcomingVisibleRows = 3
-    /// 「后续提醒」卡片固定按 3 行（含分隔线）占高，条目不足时不收缩。
-    static let upcomingListHeight = CGFloat(upcomingVisibleRows) * upcomingRowHeight + CGFloat(upcomingVisibleRows - 1)
 }
 
 enum CalendarPopoverTheme {

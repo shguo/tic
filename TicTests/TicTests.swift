@@ -233,14 +233,6 @@ final class TicTests: XCTestCase {
         XCTAssertNil(TrustedDownloadPolicy.safeDestinationURL(filename: "foo/bar.dmg", in: downloads))
     }
 
-    // MARK: - 日历弹窗定高
-
-    func testCalendarGridHeightIsSameForFiveAndSixRows() {
-        // 5 行与 6 行网格等高，切换月份时弹窗不伸缩
-        XCTAssertEqual(CalendarPopoverLayout.gridHeight(rowCount: 5), CalendarPopoverLayout.gridHeight(rowCount: 6))
-        XCTAssertEqual(CalendarPopoverLayout.maxGridHeight, CalendarPopoverLayout.gridHeight(rowCount: 5))
-    }
-
     // MARK: - 菜单栏文案拼装（MenuBarDisplayComposer）
 
     func testMenuBarWideningDigitsReplacesNumbersOnly() {
