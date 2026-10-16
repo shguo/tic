@@ -15,7 +15,7 @@ struct CalendarUpcomingListView: View {
                     .padding(.horizontal, 18)
                     .frame(maxHeight: .infinity, alignment: .top)
             } else {
-                // 可见区域固定 3 行，其余滚动查看；换选中日期时（首条变化）回到顶部
+                // 可见区域固定 3 行，其余滚动查看（不显示滚动条）；换选中日期时（首条变化）回到顶部
                 ScrollView(.vertical) {
                     LazyVStack(spacing: 0) {
                         ForEach(events) { event in
@@ -29,6 +29,7 @@ struct CalendarUpcomingListView: View {
                         }
                     }
                 }
+                .scrollIndicators(.never)
                 .id(events.first?.id)
             }
         }
