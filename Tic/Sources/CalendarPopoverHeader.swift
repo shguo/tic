@@ -17,13 +17,10 @@ struct CalendarPopoverHeader: View {
 
     private static let monthFontSize: CGFloat = 34
 
-    /// 「1月」…「12月」中最宽者的宽度。
-    private static let monthLabelWidth: CGFloat = {
-        let font = NSFont.systemFont(ofSize: monthFontSize, weight: .medium)
-        let widest = (1...12)
-            .map { ("\($0)月" as NSString).size(withAttributes: [.font: font]).width }
-            .max() ?? 0
-        return ceil(widest)
+    /// 两位数月份在等宽数字下的宽度（所有两位数宽度相同，以「88月」量取）。
+    static let monthLabelWidth: CGFloat = {
+        let font = NSFont.monospacedDigitSystemFont(ofSize: monthFontSize, weight: .medium)
+        return ceil(("88月" as NSString).size(withAttributes: [.font: font]).width)
     }()
 
     var body: some View {
@@ -32,10 +29,12 @@ struct CalendarPopoverHeader: View {
                 Button(action: onShowMonthPicker) {
                     Text("\(monthNumber)月")
                         .font(.system(size: Self.monthFontSize, weight: .medium))
+                        .monospacedDigit()
                         .foregroundStyle(palette.primaryText)
                         .contentTransition(.numericText())
-                        // 按最宽的月份预留宽度，切换月份时后面的年份与标签不左右挪动。
-                        .frame(width: Self.monthLabelWidth, alignment: .leading)
+                        // 等宽数字 + 按两位数预留宽度、靠右对齐：「月」字与后面的年份、标签位置固定，
+                        // 一位数月份左侧空出一个数字宽度。
+                        .frame(width: Self.monthLabelWidth, alignment: .trailing)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("选择月份")
