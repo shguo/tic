@@ -62,7 +62,7 @@ struct CalendarPopoverView: View {
 
     /// 网格当前展示的年份。与 `displayedYear` 不同，它随 `monthSlots` 一步到位更新，不参与数字滚动动画。
     private var gridYear: Int {
-        monthSlots.lazy.compactMap(\.date).first.map { calendar.component(.year, from: $0) } ?? displayedYear
+        monthSlots.lazy.filter(\.isInDisplayedMonth).compactMap(\.date).first.map { calendar.component(.year, from: $0) } ?? displayedYear
     }
 
     /// 当前查看年份缺少内置法定调休数据时的非阻断提示（随翻年自动更新）。
@@ -194,6 +194,11 @@ struct CalendarPopoverView: View {
         guard !calendar.isDate(nextDate, inSameDayAs: selectedDate) else {
             return
         }
+        // 点到首尾补齐的上月 / 下月日期：跳到该月并选中这一天
+        guard calendar.isDate(nextDate, equalTo: displayedMonth, toGranularity: .month) else {
+            setDisplayedMonth(startOfMonth(nextDate), selecting: nextDate)
+            return
+        }
         let nextUpcomingEvents = upcomingEvents(from: nextDate)
         selectedDate = nextDate
         upcomingEvents = nextUpcomingEvents
@@ -274,6 +279,10 @@ struct CalendarPopoverView: View {
 
     private func setDisplayedMonth(_ newMonth: Date, preservingSelectedDay: Bool) {
         let nextSelectedDate = preservingSelectedDay ? dateInMonth(newMonth, matchingDayOf: selectedDate) : newMonth
+        setDisplayedMonth(newMonth, selecting: nextSelectedDate)
+    }
+
+    private func setDisplayedMonth(_ newMonth: Date, selecting nextSelectedDate: Date) {
         let nextMonthSlots = monthSlots(for: newMonth)
         let nextUpcomingEvents = upcomingEvents(from: nextSelectedDate)
         withoutAnimation {

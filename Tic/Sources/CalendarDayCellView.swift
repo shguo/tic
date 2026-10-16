@@ -12,6 +12,8 @@ struct CalendarDayCellView: View {
     let subtitle: String
     let badge: DayBadge?
     let cellHeight: CGFloat
+    /// 为 false 时是首尾补齐的上月 / 下月日期：整格淡化显示，点击会跳到该月。
+    let isInDisplayedMonth: Bool
     let onSelect: () -> Void
 
     var body: some View {
@@ -61,6 +63,7 @@ struct CalendarDayCellView: View {
                 }
             }
             .frame(maxWidth: .infinity)
+            .opacity(isInDisplayedMonth ? 1 : Self.outsideMonthOpacity)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -68,6 +71,8 @@ struct CalendarDayCellView: View {
         .accessibilityLabel(accessibilityLabel)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
+
+    private static let outsideMonthOpacity: CGFloat = 0.35
 
     private var contentTopPadding: CGFloat {
         cellHeight < 50 ? 0 : 5
@@ -134,5 +139,6 @@ extension CalendarDayCellView: Equatable {
             && lhs.subtitle == rhs.subtitle
             && lhs.badge == rhs.badge
             && lhs.cellHeight == rhs.cellHeight
+            && lhs.isInDisplayedMonth == rhs.isInDisplayedMonth
     }
 }

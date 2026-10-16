@@ -43,6 +43,7 @@ struct CalendarMonthGridView: View {
                         subtitle: subtitle,
                         badge: slot.badge,
                         cellHeight: cellHeight,
+                        isInDisplayedMonth: slot.isInDisplayedMonth,
                         onSelect: { onSelectDate(date) }
                     )
                     .equatable()

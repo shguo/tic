@@ -26,6 +26,27 @@ final class CalendarPopoverLayoutTests: XCTestCase {
         XCTAssertEqual(CalendarPopoverLayout.gridRows, 6)
     }
 
+    func testGridPadsWithAdjacentMonthDates() {
+        // 首尾用上月 / 下月日期补齐：42 格日期连续、首格为周一，当月天数与 isInDisplayedMonth 一致
+        let calendar = Calendar.gregorianChineseLocale
+        for year in 2026...2027 {
+            for month in 1...12 {
+                let date = calendar.date(from: DateComponents(year: year, month: month, day: 15))!
+                let slots = ChineseCalendarSupport.monthSlots(for: date, showSolarTerms: true)
+                let dates = slots.compactMap(\.date)
+                XCTAssertEqual(dates.count, slots.count, "\(year)-\(month)")
+                XCTAssertEqual(calendar.component(.weekday, from: dates[0]), 2, "首格应为周一 \(year)-\(month)")
+                for (prev, next) in zip(dates, dates.dropFirst()) {
+                    XCTAssertEqual(calendar.dateComponents([.day], from: prev, to: next).day, 1, "\(year)-\(month)")
+                }
+                let inMonth = slots.filter(\.isInDisplayedMonth)
+                XCTAssertEqual(inMonth.count, calendar.range(of: .day, in: .month, for: date)!.count, "\(year)-\(month)")
+                XCTAssertTrue(inMonth.allSatisfy { $0.monthNumber == month }, "\(year)-\(month)")
+                XCTAssertTrue(slots.filter { !$0.isInDisplayedMonth }.allSatisfy { $0.monthNumber != month })
+            }
+        }
+    }
+
     func testPopoverHeightIsConstantAndMatchesLayout() {
         // 覆盖 4 / 5 / 6 行自然行数的月份，以及缺调休数据的年份（2027）
         let calendar = Calendar.gregorianChineseLocale

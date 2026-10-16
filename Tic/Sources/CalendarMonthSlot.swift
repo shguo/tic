@@ -9,19 +9,8 @@ struct CalendarMonthSlot: Identifiable {
     let subtitles: [String]
     let hasAnnotation: Bool
     let badge: DayBadge?
-
-    static func empty(monthKey: String, index: Int) -> CalendarMonthSlot {
-        CalendarMonthSlot(
-            id: "\(monthKey)-empty-\(index)",
-            date: nil,
-            monthNumber: 0,
-            dayNumber: 0,
-            isWeekend: false,
-            subtitles: [],
-            hasAnnotation: false,
-            badge: nil
-        )
-    }
+    /// 是否属于当前查看的月份；为 false 时是补齐首尾的上月 / 下月日期，淡色显示。
+    var isInDisplayedMonth: Bool = true
 
     static func day(
         _ date: Date,
@@ -31,7 +20,8 @@ struct CalendarMonthSlot: Identifiable {
         isWeekend: Bool,
         subtitles: [String],
         hasAnnotation: Bool,
-        badge: DayBadge?
+        badge: DayBadge?,
+        isInDisplayedMonth: Bool = true
     ) -> CalendarMonthSlot {
         CalendarMonthSlot(
             id: key,
@@ -41,7 +31,8 @@ struct CalendarMonthSlot: Identifiable {
             isWeekend: isWeekend,
             subtitles: subtitles,
             hasAnnotation: hasAnnotation,
-            badge: badge
+            badge: badge,
+            isInDisplayedMonth: isInDisplayedMonth
         )
     }
 

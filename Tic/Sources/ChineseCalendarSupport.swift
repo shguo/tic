@@ -299,48 +299,33 @@ enum ChineseCalendarSupport {
         monthSlots(for: month, showSolarTerms: true)
     }
 
-    /// 月历固定 6 行 × 7 列；当月最后一天之后用空格补满，切换月份时网格高度不变。
+    /// 月历固定 6 行 × 7 列；首尾按常见日历惯例用上月 / 下月日期补齐，切换月份时网格高度不变。
     static let monthGridSlotCount = 42
 
     static func monthSlots(for month: Date, showSolarTerms: Bool) -> [CalendarMonthSlot] {
         let firstOfMonth = gregorian.date(from: gregorian.dateComponents([.year, .month], from: month))!
-        let daysInMonth = gregorian.range(of: .day, in: .month, for: firstOfMonth)!.count
         let leading = mondayBasedLeadingBlankCount(
             weekdayOfFirst: gregorian.component(.weekday, from: firstOfMonth)
         )
-        let monthKey = dateKey(firstOfMonth)
-        let monthNumber = gregorian.component(.month, from: firstOfMonth)
+        let gridStart = gregorian.date(byAdding: .day, value: -leading, to: firstOfMonth)!
 
-        var slots: [CalendarMonthSlot] = []
-        slots.reserveCapacity(monthGridSlotCount)
-
-        for index in 0..<leading {
-            slots.append(CalendarMonthSlot.empty(monthKey: monthKey, index: index))
-        }
-
-        for day in 1...daysInMonth {
-            let date = gregorian.date(byAdding: .day, value: day - 1, to: firstOfMonth)!
-            let weekday = gregorian.component(.weekday, from: date)
+        return (0..<monthGridSlotCount).map { offset in
+            let date = gregorian.date(byAdding: .day, value: offset, to: gridStart)!
+            let components = gregorian.dateComponents([.month, .day, .weekday], from: date)
+            let weekday = components.weekday ?? 0
             let metadata = dayCellMetadata(for: date, showSolarTerms: showSolarTerms)
-            slots.append(
-                .day(
-                    date,
-                    key: dateKey(date),
-                    monthNumber: monthNumber,
-                    dayNumber: day,
-                    isWeekend: weekday == 1 || weekday == 7,
-                    subtitles: metadata.subtitles,
-                    hasAnnotation: metadata.hasAnnotation,
-                    badge: metadata.badge
-                )
+            return .day(
+                date,
+                key: dateKey(date),
+                monthNumber: components.month ?? 0,
+                dayNumber: components.day ?? 0,
+                isWeekend: weekday == 1 || weekday == 7,
+                subtitles: metadata.subtitles,
+                hasAnnotation: metadata.hasAnnotation,
+                badge: metadata.badge,
+                isInDisplayedMonth: gregorian.isDate(date, equalTo: firstOfMonth, toGranularity: .month)
             )
         }
-
-        while slots.count < monthGridSlotCount {
-            slots.append(CalendarMonthSlot.empty(monthKey: monthKey, index: slots.count))
-        }
-
-        return slots
     }
 
     private static func lunarDayLabel(for date: Date) -> String {
