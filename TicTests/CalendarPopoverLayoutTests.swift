@@ -103,4 +103,18 @@ final class CalendarPopoverLayoutTests: XCTestCase {
             XCTAssertEqual(fittingHeight(list), CalendarPopoverLayout.upcomingListHeight, accuracy: 0.5, "events=\(count)")
         }
     }
+
+    func testUpcomingListCoversWindowWithMinimum() {
+        let calendar = Calendar.gregorianChineseLocale
+        let date = calendar.date(from: DateComponents(year: 2026, month: 10, day: 16))!
+        let all = ChineseCalendarSupport.upcomingEvents(from: date, limit: .max, includeSolarTerms: true)
+        let list = CalendarPopoverView.upcomingListEvents(all)
+        XCTAssertTrue(list.allSatisfy { $0.daysUntil <= CalendarPopoverView.upcomingWindowDays })
+        XCTAssertEqual(list.count, all.filter { $0.daysUntil <= CalendarPopoverView.upcomingWindowDays }.count)
+        XCTAssertGreaterThan(list.count, 3)
+
+        // 90 天内不足 3 条时仍保留最近 3 条（原逻辑）
+        let sparse = all.filter { $0.title == "春节" || $0.title == "端午节" || $0.title == "中秋节" || $0.title == "国庆节" }
+        XCTAssertEqual(CalendarPopoverView.upcomingListEvents(sparse).map(\.title), Array(sparse.prefix(3)).map(\.title))
+    }
 }

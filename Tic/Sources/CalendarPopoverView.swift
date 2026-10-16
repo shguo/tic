@@ -33,11 +33,11 @@ struct CalendarPopoverView: View {
         _displayedMonth = State(initialValue: initialDay)
         _pickerYear = State(initialValue: year)
         _monthSlots = State(initialValue: ChineseCalendarSupport.monthSlots(for: initialDay, showSolarTerms: usesSolarTerms))
-        _upcomingEvents = State(initialValue: ChineseCalendarSupport.upcomingEvents(
+        _upcomingEvents = State(initialValue: Self.upcomingListEvents(ChineseCalendarSupport.upcomingEvents(
             from: initialDay,
-            limit: Self.upcomingEventLimit,
+            limit: .max,
             includeSolarTerms: usesSolarTerms
-        ))
+        )))
     }
 
     private var resolvedColorScheme: ColorScheme {
@@ -305,16 +305,24 @@ struct CalendarPopoverView: View {
         dataCache.monthSlots(for: month, showSolarTerms: showSolarTerms, calendar: calendar)
     }
 
-    /// 「后续提醒」可滚动，取查找窗口（约一年）内的全部节日 / 节气，可见区域仍为 3 行。
-    private static let upcomingEventLimit = Int.max
+    /// 「后续提醒」可滚动（可见区域 3 行）：至少列出最近 3 条，另含 90 天内的全部节日 / 节气。
+    static let upcomingMinimumCount = 3
+    static let upcomingWindowDays = 90
+
+    static func upcomingListEvents(_ events: [CalendarUpcomingEvent]) -> [CalendarUpcomingEvent] {
+        // events 已按日期升序
+        events.enumerated()
+            .prefix { $0.offset < upcomingMinimumCount || $0.element.daysUntil <= upcomingWindowDays }
+            .map(\.element)
+    }
 
     private func upcomingEvents(from date: Date) -> [CalendarUpcomingEvent] {
-        dataCache.upcomingEvents(
+        Self.upcomingListEvents(dataCache.upcomingEvents(
             from: date,
-            limit: Self.upcomingEventLimit,
+            limit: .max,
             includeSolarTerms: showSolarTerms,
             calendar: calendar
-        )
+        ))
     }
 
     private func dateInMonth(_ month: Date, matchingDayOf date: Date) -> Date {
