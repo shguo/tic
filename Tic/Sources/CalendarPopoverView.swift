@@ -60,8 +60,7 @@ struct CalendarPopoverView: View {
         calendar.component(.year, from: displayedMonth)
     }
 
-    /// 网格当前展示的年份。与 `displayedYear` 不同，它随 `monthSlots` 一步到位更新，不参与数字滚动动画，
-    /// 依赖它的布局（缺数据横幅）因此与窗口尺寸同步变化。
+    /// 网格当前展示的年份。与 `displayedYear` 不同，它随 `monthSlots` 一步到位更新，不参与数字滚动动画。
     private var gridYear: Int {
         monthSlots.lazy.compactMap(\.date).first.map { calendar.component(.year, from: $0) } ?? displayedYear
     }
@@ -73,14 +72,8 @@ struct CalendarPopoverView: View {
             : nil
     }
 
-    /// 弹窗总高，由当前布局状态直接算出；内容与窗口都按它定高。
-    private var popoverHeight: CGFloat {
-        CalendarPopoverLayout.popoverHeight(
-            gridRowCount: CalendarPopoverLayout.gridRowCount(slotCount: monthSlots.count),
-            showsDataCoverageBanner: dataCoverageNotice != nil,
-            upcomingEventCount: upcomingEvents.count
-        )
-    }
+    /// 弹窗总高（定制版固定）；内容与窗口都按它定高。
+    private var popoverHeight: CGFloat { CalendarPopoverLayout.popoverHeight }
 
     private var relativeOffsetLabel: String? {
         let label = ChineseCalendarSupport.relativeDayLabel(for: selectedDate)
@@ -99,6 +92,7 @@ struct CalendarPopoverView: View {
                 year: displayedYear,
                 relativeOffsetLabel: relativeOffsetLabel,
                 nextRestDayCountdownLabel: nextRestDayCountdownLabel,
+                dataCoverageNotice: dataCoverageNotice,
                 palette: palette,
                 onShowMonthPicker: showMonthPicker,
                 onPreviousMonth: { shiftMonth(by: -1) },
@@ -113,10 +107,6 @@ struct CalendarPopoverView: View {
             .padding(.horizontal, 20)
             .padding(.top, CalendarPopoverLayout.headerTopPadding)
             .padding(.bottom, CalendarPopoverLayout.headerBottomPadding)
-
-            if let dataCoverageNotice {
-                dataCoverageBanner(dataCoverageNotice)
-            }
 
             CalendarWeekdayRow(palette: palette)
                 .padding(.horizontal, 20)
@@ -274,27 +264,6 @@ struct CalendarPopoverView: View {
 
     private func showSettings() {
         SettingsWindowManager.show()
-    }
-
-    @ViewBuilder
-    private func dataCoverageBanner(_ text: String) -> some View {
-        HStack(spacing: 6) {
-            Image(systemName: "exclamationmark.circle")
-                .font(.system(size: 11, weight: .medium))
-            Text(text)
-                .font(.system(size: 11))
-            Spacer(minLength: 0)
-        }
-        .foregroundStyle(palette.secondaryText)
-        .padding(.horizontal, 10)
-        .frame(height: CalendarPopoverLayout.dataCoverageBannerHeight)
-        .background(palette.controlBackground, in: RoundedRectangle(cornerRadius: 8))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8).strokeBorder(palette.controlBorder)
-        }
-        .padding(.horizontal, 20)
-        .padding(.bottom, CalendarPopoverLayout.dataCoverageBannerBottomPadding)
-        .accessibilityElement(children: .combine)
     }
 
     private func setDisplayed(month: Int, year: Int) {

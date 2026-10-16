@@ -25,7 +25,7 @@ struct CalendarUpcomingListView: View {
                 }
             }
         }
-        .frame(height: CalendarPopoverLayout.upcomingListHeight(eventCount: events.count), alignment: .top)
+        .frame(height: CalendarPopoverLayout.upcomingListHeight, alignment: .top)
         .background(palette.cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .shadow(color: palette.shadow, radius: 0, x: 0, y: 1)
     }

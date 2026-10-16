@@ -299,6 +299,9 @@ enum ChineseCalendarSupport {
         monthSlots(for: month, showSolarTerms: true)
     }
 
+    /// 月历固定 6 行 × 7 列；当月最后一天之后用空格补满，切换月份时网格高度不变。
+    static let monthGridSlotCount = 42
+
     static func monthSlots(for month: Date, showSolarTerms: Bool) -> [CalendarMonthSlot] {
         let firstOfMonth = gregorian.date(from: gregorian.dateComponents([.year, .month], from: month))!
         let daysInMonth = gregorian.range(of: .day, in: .month, for: firstOfMonth)!.count
@@ -309,7 +312,7 @@ enum ChineseCalendarSupport {
         let monthNumber = gregorian.component(.month, from: firstOfMonth)
 
         var slots: [CalendarMonthSlot] = []
-        slots.reserveCapacity(leading + daysInMonth)
+        slots.reserveCapacity(monthGridSlotCount)
 
         for index in 0..<leading {
             slots.append(CalendarMonthSlot.empty(monthKey: monthKey, index: index))
@@ -331,6 +334,10 @@ enum ChineseCalendarSupport {
                     badge: metadata.badge
                 )
             )
+        }
+
+        while slots.count < monthGridSlotCount {
+            slots.append(CalendarMonthSlot.empty(monthKey: monthKey, index: slots.count))
         }
 
         return slots

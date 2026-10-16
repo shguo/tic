@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 struct CalendarPopoverHeader: View {
@@ -5,6 +6,8 @@ struct CalendarPopoverHeader: View {
     let year: Int
     let relativeOffsetLabel: String?
     let nextRestDayCountdownLabel: String?
+    /// 当前查看年份缺少内置调休数据时的提示；以小图标 + 悬停提示显示在标题行末尾，不占额外行高、不推动其他元素。
+    let dataCoverageNotice: String?
     let palette: CalendarPalette
     let onShowMonthPicker: () -> Void
     let onPreviousMonth: () -> Void
@@ -12,14 +15,27 @@ struct CalendarPopoverHeader: View {
     let onNextMonth: () -> Void
     let onShowSettings: () -> Void
 
+    private static let monthFontSize: CGFloat = 34
+
+    /// 「1月」…「12月」中最宽者的宽度。
+    private static let monthLabelWidth: CGFloat = {
+        let font = NSFont.systemFont(ofSize: monthFontSize, weight: .medium)
+        let widest = (1...12)
+            .map { ("\($0)月" as NSString).size(withAttributes: [.font: font]).width }
+            .max() ?? 0
+        return ceil(widest)
+    }()
+
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             HStack(alignment: .lastTextBaseline, spacing: 8) {
                 Button(action: onShowMonthPicker) {
                     Text("\(monthNumber)月")
-                        .font(.system(size: 34, weight: .medium))
+                        .font(.system(size: Self.monthFontSize, weight: .medium))
                         .foregroundStyle(palette.primaryText)
                         .contentTransition(.numericText())
+                        // 按最宽的月份预留宽度，切换月份时后面的年份与标签不左右挪动。
+                        .frame(width: Self.monthLabelWidth, alignment: .leading)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("选择月份")
@@ -30,6 +46,7 @@ struct CalendarPopoverHeader: View {
                         .foregroundStyle(palette.secondaryText)
                         .monospacedDigit()
                         .contentTransition(.numericText())
+                        .fixedSize()
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("选择年份")
@@ -38,6 +55,7 @@ struct CalendarPopoverHeader: View {
                     Text(relativeOffsetLabel)
                         .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(palette.accent)
+                        .fixedSize()
                         .padding(.horizontal, 7)
                         .frame(height: 16)
                         .background(palette.accent.opacity(0.10), in: Capsule())
@@ -49,6 +67,7 @@ struct CalendarPopoverHeader: View {
                     Text(nextRestDayCountdownLabel)
                         .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(palette.accent)
+                        .fixedSize()
                         .padding(.horizontal, 7)
                         .frame(height: 16)
                         .background(palette.accent.opacity(0.10), in: Capsule())
@@ -56,6 +75,14 @@ struct CalendarPopoverHeader: View {
                             Capsule().strokeBorder(palette.accent.opacity(0.18))
                         }
                         .accessibilityLabel("距离\(nextRestDayCountdownLabel)")
+                }
+
+                if let dataCoverageNotice {
+                    Image(systemName: "exclamationmark.circle")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(palette.secondaryText)
+                        .help(dataCoverageNotice)
+                        .accessibilityLabel(dataCoverageNotice)
                 }
             }
             .layoutPriority(1)

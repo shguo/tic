@@ -16,24 +16,22 @@ enum CalendarPopoverLayout {
         return CGFloat(rowCount) * fiveRowCellHeight + CGFloat(rowCount - 1) * fiveRowSpacing
     }
 
-    static let maxGridHeight = max(gridHeight(rowCount: 5), gridHeight(rowCount: 6))
-
     static func gridRowCount(slotCount: Int) -> Int {
         Int(ceil(Double(slotCount) / 7.0))
     }
 
-    // MARK: - 弹窗各区块高度
+    // MARK: - 弹窗各区块尺寸（全部固定）
     //
-    // 弹窗总高由下列常量直接算出（`popoverHeight`），视图按同一组常量显式定高，
-    // 窗口尺寸与内容在同一次更新里一起变化（见 `PopoverWindowSizer`），不再等系统事后推算。
-    // 改动任何区块的字号 / 间距时，同步改这里；`testPopoverHeightMatchesLayout` 会校验二者一致。
+    // 定制版：月历固定 6 行、「后续提醒」固定 3 行、缺数据提示放在标题行，
+    // 弹窗总高 `popoverHeight` 恒定，切换月份时窗口与各区块都不改变尺寸。
+    // 改动任何区块的字号 / 间距时同步改这里；`CalendarPopoverLayoutTests` 会校验与实际排版一致。
+
+    static let gridRows = ChineseCalendarSupport.monthGridSlotCount / 7
+    static let fixedGridHeight = gridHeight(rowCount: gridRows)
 
     static let headerTopPadding: CGFloat = 8
     static let headerHeight: CGFloat = 40
     static let headerBottomPadding: CGFloat = 16
-
-    static let dataCoverageBannerHeight: CGFloat = 26
-    static let dataCoverageBannerBottomPadding: CGFloat = 12
 
     static let weekdayRowHeight: CGFloat = 18
     static let weekdayRowBottomPadding: CGFloat = 12
@@ -45,21 +43,19 @@ enum CalendarPopoverLayout {
 
     static let upcomingRowHeight: CGFloat = 65
     static let upcomingDividerHeight: CGFloat = 1
+    static let upcomingVisibleRows = 3
+    /// 「后续提醒」卡片固定按 3 行（含分隔线）占高，条目不足时不收缩。
+    static let upcomingListHeight = CGFloat(upcomingVisibleRows) * upcomingRowHeight
+        + CGFloat(upcomingVisibleRows - 1) * upcomingDividerHeight
 
-    /// 「后续提醒」卡片高度；无条目时显示一行占位文案。
-    static func upcomingListHeight(eventCount: Int) -> CGFloat {
-        let rows = max(eventCount, 1)
-        return CGFloat(rows) * upcomingRowHeight + CGFloat(rows - 1) * upcomingDividerHeight
-    }
-
-    static func popoverHeight(gridRowCount: Int, showsDataCoverageBanner: Bool, upcomingEventCount: Int) -> CGFloat {
+    /// 弹窗总高（固定）。
+    static let popoverHeight: CGFloat = {
         let header = headerTopPadding + headerHeight + headerBottomPadding
-        let banner = showsDataCoverageBanner ? dataCoverageBannerHeight + dataCoverageBannerBottomPadding : 0
         let weekday = weekdayRowHeight + weekdayRowBottomPadding
         let details = detailsTopSpacing + detailsVerticalPadding * 2 + lunarCardHeight + detailsCardSpacing
-            + upcomingListHeight(eventCount: upcomingEventCount)
-        return header + banner + weekday + gridHeight(rowCount: gridRowCount) + details
-    }
+            + upcomingListHeight
+        return header + weekday + fixedGridHeight + details
+    }()
 }
 
 enum CalendarPopoverTheme {
