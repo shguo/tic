@@ -124,6 +124,13 @@ final class TicTests: XCTestCase {
         XCTAssertEqual(subtitle(2023, 3, 22), DaySubtitle(text: "闰二月", kind: .lunarMonthStart))
     }
 
+    func testUpcomingEventKinds() {
+        // 2027-02-01 之后：立春（节气）、除夕、春节（节日）
+        let events = ChineseCalendarSupport.upcomingEvents(from: gregorianDate(2027, 2, 1), limit: 3, includeSolarTerms: true)
+        XCTAssertEqual(events.map(\.title), ["立春", "除夕", "春节"])
+        XCTAssertEqual(events.map(\.kind), [.solarTerm, .festival, .festival])
+    }
+
     // MARK: - 版本比较（检查更新）
 
     // MARK: - 检查更新：API 限流降级

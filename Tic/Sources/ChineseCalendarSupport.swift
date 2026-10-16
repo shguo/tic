@@ -17,6 +17,7 @@ enum ChineseCalendarSupport {
         let title: String
         let dateLabel: String
         let priority: Int
+        let kind: DaySubtitleKind
     }
 
     /// 农历、节气、调休均以北京时间（东八区）为「当天」边界，与 LunarSwift / holiday-cn 一致。
@@ -290,7 +291,8 @@ enum ChineseCalendarSupport {
                 title: item.title,
                 date: item.date,
                 daysUntil: days,
-                dateLabel: item.dateLabel
+                dateLabel: item.dateLabel,
+                kind: item.kind
             )
         }
     }
@@ -432,7 +434,8 @@ enum ChineseCalendarSupport {
                     date: date,
                     title: festival.eventTitle,
                     dateLabel: lunarDateLabel(for: date),
-                    priority: 1
+                    priority: 1,
+                    kind: .festival
                 ))
             }
             guard let next = gregorian.date(byAdding: .day, value: 1, to: date) else { break }
@@ -459,7 +462,8 @@ enum ChineseCalendarSupport {
                     date: date,
                     title: template.eventTitle,
                     dateLabel: gregorianDateLabel(for: date),
-                    priority: 1
+                    priority: 1,
+                    kind: .festival
                 ))
             }
 
@@ -470,7 +474,8 @@ enum ChineseCalendarSupport {
                     date: event.date,
                     title: event.eventTitle,
                     dateLabel: gregorianDateLabel(for: event.date),
-                    priority: 1
+                    priority: 1,
+                    kind: .festival
                 ))
             }
         }
@@ -490,7 +495,8 @@ enum ChineseCalendarSupport {
                     date: term.date,
                     title: term.name,
                     dateLabel: lunarDateLabel(for: term.date),
-                    priority: 2
+                    priority: 2,
+                    kind: .solarTerm
                 ))
             }
         }
