@@ -6,6 +6,9 @@ struct CalendarPopoverView: View {
     @State private var isMonthPickerPresented = false
     @State private var pickerYear: Int
     @State private var subtitleRotationIndex = 0
+    /// 弹窗是否展开。`MenuBarExtra` 收起时只隐藏窗口、不销毁视图，副标题轮播需随之暂停，
+    /// 否则每 3 秒都会重算一次隐藏中的整个弹窗（后台持续占用 CPU）。
+    @State private var isPopoverVisible = false
     @State private var monthSlots: [CalendarMonthSlot]
     @State private var upcomingEvents: [CalendarUpcomingEvent]
     @State private var dataCache = CalendarPopoverDataCache()
@@ -154,18 +157,30 @@ struct CalendarPopoverView: View {
             shiftSelectedDate(by: 7)
             return .handled
         }
-        .onReceive(Timer.publish(every: 3, on: .main, in: .common).autoconnect()) { _ in
-            rotateSubtitles()
+        .task(id: isPopoverVisible) {
+            guard isPopoverVisible else { return }
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(3))
+                guard !Task.isCancelled else { break }
+                rotateSubtitles()
+            }
         }
         .onAppear {
+            isPopoverVisible = true
             refreshCalendarData(displayedMonth: displayedMonth, selectedDate: selectedDate)
         }
         .background {
             MenuBarWindowVisibilityObserver(
                 // MenuBarExtra 会保留 @State；收起时就回到今天，下次打开时窗口直接是今天这个月的尺寸，
                 // 不会先闪出上次的高度（Issue #2）。打开时再检查一次，覆盖跨零点等情况。
-                onBecomeVisible: { resetSelectionToToday() },
-                onBecomeHidden: { resetSelectionToToday() }
+                onBecomeVisible: {
+                    isPopoverVisible = true
+                    resetSelectionToToday()
+                },
+                onBecomeHidden: {
+                    isPopoverVisible = false
+                    resetSelectionToToday()
+                }
             )
         }
         .onChange(of: displayOptions) {
