@@ -5,6 +5,16 @@
 
 ## [Unreleased]
 
+## [1.3.9] - 2026-10-26
+
+### 定制版（shguo/tic）
+
+- 节日补齐并分档：新增植树节、建党节、上巳节，以及愚人节、万圣节（10/31）、感恩节；移除微笑日、护士节、博物馆日、国际茶日、环境日。官方节日对齐《全国年节及纪念日放假办法》与 Apple「中国大陆节假日」
+- 设置 → 日历 新增「显示西方节日」开关（默认开启），控制情人节、母亲节、父亲节、愚人节、万圣节、感恩节、平安夜、圣诞节
+- 月历节日统一显示正式全名（元宵节、端午节、中秋节、重阳节、七夕节等）
+- 修复：中秋、端午、清明及合并假期（国庆节、中秋节）首日，月历格副标题在两个名称间重复轮播
+- 修复：设备时区不在东八区时日期错位——东京等地月初打开显示上个月、农历慢一天；洛杉矶等地点选日期高亮落在前一天、菜单栏下午起农历显示次日
+
 ## [1.3.8] - 2026-10-16
 
 ### 定制版（shguo/tic）
@@ -203,7 +213,8 @@
 - 登录时自动启动
 - macOS 应用图标
 
-[Unreleased]: https://github.com/shguo/tic/compare/v1.3.8...HEAD
+[Unreleased]: https://github.com/shguo/tic/compare/v1.3.9...HEAD
+[1.3.9]: https://github.com/shguo/tic/compare/v1.3.8...v1.3.9
 [1.3.8]: https://github.com/shguo/tic/compare/v1.3.7...v1.3.8
 [1.3.7]: https://github.com/shguo/tic/compare/v1.3.6...v1.3.7
 [1.3.6]: https://github.com/shguo/tic/compare/v1.3.5...v1.3.6
