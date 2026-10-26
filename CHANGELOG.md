@@ -5,6 +5,14 @@
 
 ## [Unreleased]
 
+## [1.3.10] - 2026-10-26
+
+### 定制版（shguo/tic）
+
+- 降低后台耗电：弹窗收起后不再持续重算界面（原先常驻约 0.3–1% CPU、每秒约 78 次唤醒，现接近 0）；菜单栏显示秒时 CPU 也有所下降
+- 修复：菜单栏不显示秒时，分钟数最多晚 59 秒才跳变，现在准点更新
+- 切换或插拔显示器后菜单栏图标不再发虚
+
 ## [1.3.9] - 2026-10-26
 
 ### 定制版（shguo/tic）
@@ -213,7 +221,8 @@
 - 登录时自动启动
 - macOS 应用图标
 
-[Unreleased]: https://github.com/shguo/tic/compare/v1.3.9...HEAD
+[Unreleased]: https://github.com/shguo/tic/compare/v1.3.10...HEAD
+[1.3.10]: https://github.com/shguo/tic/compare/v1.3.9...v1.3.10
 [1.3.9]: https://github.com/shguo/tic/compare/v1.3.8...v1.3.9
 [1.3.8]: https://github.com/shguo/tic/compare/v1.3.7...v1.3.8
 [1.3.7]: https://github.com/shguo/tic/compare/v1.3.6...v1.3.7
