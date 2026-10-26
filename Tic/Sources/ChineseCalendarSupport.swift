@@ -151,7 +151,9 @@ enum ChineseCalendarSupport {
         if let lunarFest = lunarFest?.cellTitle {
             subtitles.append(DaySubtitle(text: lunarFest, kind: .festival))
         }
+        // 放假数据用全名（「中秋节」「清明节」），与同日农历节日 / 节气的短名重复时不再追加。
         if let subtitle = ann?.subtitle,
+           !subtitles.contains(where: { $0.text == subtitle || $0.text + "节" == subtitle }),
            ann?.badge != .rest || isFirstAnnotatedHoliday(date, subtitle: subtitle) {
             subtitles.append(DaySubtitle(text: subtitle, kind: .festival))
         }

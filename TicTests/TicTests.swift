@@ -141,6 +141,13 @@ final class TicTests: XCTestCase {
         XCTAssertEqual(label("万圣节"), "10月31日 | 九月廿二 | 周六")
     }
 
+    func testHolidayNameNotDuplicatedWithFestival() {
+        // 放假数据的「中秋节」「端午节」「清明节」与农历节日 / 节气同日时只显示一次
+        XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 9, 25)), ["中秋"])
+        XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 6, 19)), ["端午"])
+        XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2025, 4, 4)), ["清明"])
+    }
+
     func testFestivalTiers() {
         XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 10, 31)).contains("万圣节"))
         XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 3, 12)).contains("植树节"))
