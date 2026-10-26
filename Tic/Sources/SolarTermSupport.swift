@@ -4,13 +4,7 @@ import LunarSwift
 /// 二十四节气：由 LunarSwift 按天文算法计算，任意年份有效（替代旧的硬编码查表）。
 /// 对外 API 与旧实现保持一致，`ChineseCalendarSupport` 无需改动。
 enum SolarTermSupport {
-    private static let beijingTimeZone = TimeZone(identifier: "Asia/Shanghai") ?? .current
-
-    private static let gregorian: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = beijingTimeZone
-        return calendar
-    }()
+    private static let gregorian = BeijingCalendar.gregorian
 
     private static let standardNames: Set<String> = [
         "小寒", "大寒", "立春", "雨水", "惊蛰", "春分", "清明", "谷雨",

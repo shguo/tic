@@ -19,17 +19,12 @@ struct CalendarPopoverView: View {
     @AppStorage(AppSettings.showWesternFestivalsKey) private var showWesternFestivals = true
     @AppStorage(AppSettings.showYiJiKey) private var showYiJi = true
 
-    private let calendar: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = Locale(identifier: "zh_CN")
-        return calendar
-    }()
+    /// 选中日 / 展示月均为东八区零点，见 `BeijingCalendar` 的约定。
+    private let calendar = BeijingCalendar.gregorian
 
     init(initialDate: Date = .now) {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = Locale(identifier: "zh_CN")
-        let initialDay = calendar.startOfDay(for: initialDate)
-        let year = calendar.component(.year, from: initialDay)
+        let initialDay = BeijingCalendar.day(containing: initialDate)
+        let year = BeijingCalendar.gregorian.component(.year, from: initialDay)
         let options = CalendarDisplayOptions.fromUserDefaults()
         _selectedDate = State(initialValue: initialDay)
         _displayedMonth = State(initialValue: initialDay)
@@ -254,7 +249,7 @@ struct CalendarPopoverView: View {
     }
 
     private func applyTodaySelection(animated: Bool) {
-        let today = CalendarPopoverSelection.today(now: .now, calendar: calendar)
+        let today = CalendarPopoverSelection.today(now: .now)
         let nextMonthSlots = monthSlots(for: today.displayedMonth)
         let nextUpcomingEvents = upcomingEvents(from: today.selectedDate)
         withoutAnimation {

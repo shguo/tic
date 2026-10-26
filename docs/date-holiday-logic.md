@@ -52,6 +52,8 @@ BeijingCalendar.swift
 
 `gregorian`（locale `zh_CN`，时区 `Asia/Shanghai`）负责公历换算；`chinese`（同东八区）负责农历年/月/日与 `isLeapMonth`。与 LunarSwift、`HolidayStore` 的「当天」边界一致。
 
+**「某一天」的表示**：应用内（节日 / 农历 / 放假数据、弹窗的选中日与展示月、月历格 id）统一用东八区该公历日的零点。设备时区只在把当前时刻换成日期时使用：`BeijingCalendar.day(containing: .now)` 取用户墙上的公历日，再映射为东八区同日零点。菜单栏的日期 / 时间按设备时区格式化，农历与周数取同一公历日。这样东京、洛杉矶等时区看到的日期、农历、节日与东八区一致（`TicTests/TimeZoneTests` 覆盖）。
+
 ### ② LunarSwift（SPM）
 
 SolarTermSupport.swift · project.yml

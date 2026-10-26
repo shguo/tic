@@ -6,8 +6,8 @@ struct CalendarPopoverSelection: Equatable {
     var selectedDate: Date
     var displayedMonth: Date
 
-    static func today(now: Date = .now, calendar: Calendar = .gregorianChineseLocale) -> Self {
-        let day = calendar.startOfDay(for: now)
+    static func today(now: Date = .now, localCalendar: Calendar = .current) -> Self {
+        let day = BeijingCalendar.day(containing: now, localCalendar: localCalendar)
         return Self(selectedDate: day, displayedMonth: day)
     }
 }

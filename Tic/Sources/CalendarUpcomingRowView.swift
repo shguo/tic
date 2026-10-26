@@ -4,8 +4,6 @@ struct CalendarUpcomingRowView: View {
     let event: CalendarUpcomingEvent
     let palette: CalendarPalette
 
-    private let calendar = Calendar(identifier: .gregorian)
-
     /// 标题颜色，与月历日期格同色：节日红、节气绿。
     private var kindColor: Color? {
         switch event.kind {
@@ -55,6 +53,7 @@ struct CalendarUpcomingRowView: View {
     }
 
     private var showsTodayLabel: Bool {
-        event.daysUntil == 0 && calendar.isDateInToday(event.date)
+        event.daysUntil == 0
+            && BeijingCalendar.gregorian.isDate(event.date, inSameDayAs: BeijingCalendar.day(containing: .now))
     }
 }

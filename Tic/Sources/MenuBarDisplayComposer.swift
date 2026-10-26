@@ -154,9 +154,10 @@ enum MenuBarDisplayComposer {
         case .weekday:
             return format(date, pattern: "EEE")
         case .weekNumber:
-            return "(\(ChineseCalendarSupport.weekOfYear(for: date)))"
+            return "(\(ChineseCalendarSupport.weekOfYear(for: BeijingCalendar.day(containing: date))))"
         case .lunar:
-            return ChineseCalendarSupport.lunarMonthDayLabel(for: date)
+            // 日期按设备时区显示，农历取同一公历日（见 `BeijingCalendar` 的约定）
+            return ChineseCalendarSupport.lunarMonthDayLabel(for: BeijingCalendar.day(containing: date))
         case .time:
             let pattern: String
             if use24Hour {

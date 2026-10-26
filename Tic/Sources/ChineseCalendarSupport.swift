@@ -71,7 +71,7 @@ enum ChineseCalendarSupport {
         relativeTo reference: Date = .now
     ) -> String {
         let target = gregorian.startOfDay(for: date)
-        let anchor = gregorian.startOfDay(for: reference)
+        let anchor = BeijingCalendar.day(containing: reference)
         let days = gregorian.dateComponents([.day], from: anchor, to: target).day ?? 0
         switch days {
         case 0: return "今天"

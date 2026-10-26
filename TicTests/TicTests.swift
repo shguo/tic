@@ -403,7 +403,7 @@ final class TicTests: XCTestCase {
         var calendar = Calendar(identifier: .gregorian)
         calendar.locale = Locale(identifier: "zh_CN")
         let afternoon = calendar.date(from: DateComponents(year: 2026, month: 7, day: 10, hour: 15, minute: 30))!
-        let selection = CalendarPopoverSelection.today(now: afternoon, calendar: calendar)
+        let selection = CalendarPopoverSelection.today(now: afternoon, localCalendar: calendar)
         let expected = calendar.startOfDay(for: afternoon)
         XCTAssertEqual(selection.selectedDate, expected)
         XCTAssertEqual(selection.displayedMonth, expected)
@@ -414,7 +414,7 @@ final class TicTests: XCTestCase {
         calendar.locale = Locale(identifier: "zh_CN")
         let today = calendar.date(from: DateComponents(year: 2026, month: 7, day: 10, hour: 9))!
         let previous = calendar.date(from: DateComponents(year: 2026, month: 6, day: 1))!
-        let reset = CalendarPopoverSelection.today(now: today, calendar: calendar)
+        let reset = CalendarPopoverSelection.today(now: today, localCalendar: calendar)
         XCTAssertFalse(calendar.isDate(reset.selectedDate, inSameDayAs: previous))
         XCTAssertTrue(calendar.isDate(reset.selectedDate, inSameDayAs: today))
     }

@@ -8,12 +8,11 @@ struct CalendarMonthGridView: View {
     let subtitleRotationIndex: Int
     let onSelectDate: (Date) -> Void
 
-    private let calendar = Calendar(identifier: .gregorian)
     private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 7)
 
     var body: some View {
-        let selectedDayID = dayID(for: selectedDate)
-        let todayID = dayID(for: .now)
+        let selectedDayID = BeijingCalendar.dateKey(selectedDate)
+        let todayID = BeijingCalendar.dateKey(BeijingCalendar.day(containing: .now))
 
         LazyVGrid(columns: columns, spacing: CalendarPopoverLayout.gridRowSpacing) {
             ForEach(slots) { slot in
@@ -34,17 +33,5 @@ struct CalendarMonthGridView: View {
                 .equatable()
             }
         }
-    }
-
-    private func dayID(for date: Date) -> String {
-        let components = calendar.dateComponents([.year, .month, .day], from: date)
-        let year = components.year ?? 0
-        let month = components.month ?? 0
-        let day = components.day ?? 0
-        return "\(year)-\(Self.twoDigit(month))-\(Self.twoDigit(day))"
-    }
-
-    private static func twoDigit(_ value: Int) -> String {
-        value < 10 ? "0\(value)" : "\(value)"
     }
 }

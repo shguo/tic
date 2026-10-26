@@ -55,7 +55,7 @@ scripts/restart-dev.sh
 - 日历弹出层：`Tic/Sources/CalendarPopoverView.swift`
 - 月历 / 后续提醒合并：`Tic/Sources/CalendarMonthBuilder.swift`（节日 + 节气 + 放假数据 → 月历格、后续提醒、下个假期；显示选项 `CalendarDisplayOptions`）
 - 节日：`Tic/Sources/Festival/FestivalCatalog.swift`（唯一节日表，分传统 / 官方 / 西方三档）、`Festival/FestivalCalendar.swift`（按公历年推算并缓存）
-- 农历 / 节气：`Tic/Sources/ChineseCalendarSupport.swift`（农历文字、干支、宜忌）、`Tic/Sources/SolarTermSupport.swift`（二十四节气，LunarSwift 算法、按公历年缓存）；东八区日历共用 `BeijingCalendar.swift`
+- 农历 / 节气：`Tic/Sources/ChineseCalendarSupport.swift`（农历文字、干支、宜忌）、`Tic/Sources/SolarTermSupport.swift`（二十四节气，LunarSwift 算法、按公历年缓存）；东八区日历共用 `BeijingCalendar.swift`——应用内「某一天」统一用东八区该日零点表示，设备时区只用于判断「现在是几号」（`BeijingCalendar.day(containing:)`），界面不要再用 `Calendar(identifier:)` / `Calendar.current` 处理日期
 - 节日逻辑回归：`TicTests/CalendarSnapshotTests.swift` 逐日快照 2024–2030，改动节日 / 放假逻辑后必须通过；有意改变输出时删 fixture 重新生成并检查 diff
 - 法定节假日 / 调休：`Tic/Sources/Holiday/HolidayStore.swift`（仅打包 `Resources/holidays/*.json`，随发版更新；见 [`docs/holiday-data-source.md`](docs/holiday-data-source.md)）
 - 设置：AppKit 实现，入口 `SettingsWindowManager.show()` → `Settings/SettingsSplitViewController.swift`（侧栏 `SettingsSidebarViewController`、详情 `Settings/*SettingsViewController.swift`；实现与踩坑见 [`docs/settings-sidebar.md`](docs/settings-sidebar.md)）
