@@ -149,19 +149,23 @@ enum CalendarMonthBuilder {
     /// 距下一法定休首日（HolidayStore 中 badge 为「休」的首日）的天数；今天已是休假日则跳过当前连休。
     static func nextRestDayCountdown(from date: Date) -> (name: String, days: Int)? {
         let start = gregorian.startOfDay(for: date)
-        for offset in 0..<370 {
-            guard let candidate = gregorian.date(byAdding: .day, value: offset, to: start),
-                  let stored = storedAnnotation(for: candidate),
-                  stored.badge == .rest,
-                  let name = stored.subtitle,
-                  isFirstAnnotatedHoliday(candidate, subtitle: name)
-            else { continue }
-            if offset > 0 {
-                return (name, offset)
-            }
-        }
-        return nil
+        guard let next = restPeriodStarts.first(where: { $0.date > start }),
+              let days = gregorian.dateComponents([.day], from: start, to: next.date).day,
+              days < 370
+        else { return nil }
+        return (next.name, days)
     }
+
+    /// 放假数据中每段连休的首日（升序）。放假数据启动时加载后不再变化，只算一次；
+    /// 弹窗展开时每 3 秒轮播都会重算头部，不能每次逐日扫描。
+    private static let restPeriodStarts: [(date: Date, name: String)] = HolidayStore.shared.restDayKeys
+        .compactMap { key -> (date: Date, name: String)? in
+            guard let date = BeijingCalendar.date(fromKey: key),
+                  let name = storedAnnotation(for: date)?.subtitle,
+                  isFirstAnnotatedHoliday(date, subtitle: name)
+            else { return nil }
+            return (date, name)
+        }
 
     static func nextRestDayCountdownLabel(from date: Date) -> String? {
         guard let next = nextRestDayCountdown(from: date) else { return nil }

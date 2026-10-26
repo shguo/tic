@@ -34,6 +34,12 @@ final class HolidayStore: @unchecked Sendable {
         return byKey[key]
     }
 
+    /// 所有放假日（休）的键，升序。
+    var restDayKeys: [String] {
+        lock.lock(); defer { lock.unlock() }
+        return byKey.filter { $0.value.badge == .rest }.keys.sorted()
+    }
+
     /// 内置数据覆盖的最大年份；无任何数据时为 0。
     var maxCoveredYear: Int {
         lock.lock(); defer { lock.unlock() }

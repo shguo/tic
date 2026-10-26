@@ -170,9 +170,28 @@ enum MenuBarDisplayComposer {
     }
 
     private static func format(_ date: Date, pattern: String) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN")
-        formatter.dateFormat = pattern
-        return formatter.string(from: date)
+        formatterCache.formatter(pattern: pattern, timeZone: NSTimeZone.default).string(from: date)
+    }
+
+    /// 菜单栏每秒格式化一次，复用 `DateFormatter`（创建开销大）。按 `NSTimeZone.default`
+    /// （即新建 `DateFormatter` 的默认时区）区分，时区变化后自动换新。
+    private static let formatterCache = FormatterCache()
+
+    private final class FormatterCache: @unchecked Sendable {
+        private let lock = NSLock()
+        private var storage: [String: DateFormatter] = [:]
+
+        func formatter(pattern: String, timeZone: TimeZone) -> DateFormatter {
+            let key = "\(pattern)|\(timeZone.identifier)"
+            lock.lock()
+            defer { lock.unlock() }
+            if let cached = storage[key] { return cached }
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "zh_CN")
+            formatter.timeZone = timeZone
+            formatter.dateFormat = pattern
+            storage[key] = formatter
+            return formatter
+        }
     }
 }

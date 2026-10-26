@@ -15,32 +15,15 @@ private extension Font {
 struct MenuBarDateLabel: View {
     @AppStorage(AppSettings.showSecondsKey) private var showSeconds = true
     @AppStorage(AppSettings.use24HourKey) private var use24Hour = true
-    @State private var now = Date.now
     @State private var settingsRevision = 0
+    /// 宽度等只依赖设置的部分，设置变化时才重算（测量文字较重，不放进每秒刷新）。
+    @State private var layout = MenuBarLabelLayout.current()
+    /// 当前位图对应的文案；文案未变时跳过重绘。
+    @State private var renderedMetrics: MenuBarLabelMetrics?
     @State private var labelImage: NSImage?
 
-    private var blockOrder: [MenuBarBlock] {
-        _ = settingsRevision
-        return AppSettings.loadBlockOrder()
-    }
-
-    private var enabledBlocks: Set<MenuBarBlock> {
-        _ = settingsRevision
-        return AppSettings.loadEnabledBlocks()
-    }
-
-    private var updateInterval: TimeInterval {
-        enabledBlocks.contains(.time) && showSeconds ? 1 : 60
-    }
-
-    private var metrics: MenuBarLabelMetrics {
-        _ = settingsRevision
-        _ = showSeconds
-        _ = use24Hour
-        return MenuBarLabelMetrics.current(date: now)
-    }
-
     var body: some View {
+        let metrics = renderedMetrics ?? MenuBarLabelMetrics.make(date: .now, layout: layout)
         Group {
             if let labelImage {
                 Image(nsImage: labelImage)
@@ -54,13 +37,15 @@ struct MenuBarDateLabel: View {
         }
         .frame(width: metrics.labelWidth, height: 22)
         .fixedSize(horizontal: true, vertical: true)
-        .onAppear { renderLabelImage() }
-        .onChange(of: settingsRevision) { _, _ in renderLabelImage() }
-        .task(id: updateInterval) {
+        .onAppear { refresh(force: true) }
+        .onChange(of: settingsRevision) { _, _ in reloadLayout() }
+        .onChange(of: showSeconds) { _, _ in reloadLayout() }
+        .onChange(of: use24Hour) { _, _ in reloadLayout() }
+        .task(id: layout.updateInterval) {
+            let interval = layout.updateInterval
             while !Task.isCancelled {
-                now = .now
-                renderLabelImage()
-                try? await Task.sleep(for: .seconds(updateInterval))
+                refresh()
+                try? await Task.sleep(for: .seconds(Self.delayUntilNextTick(interval: interval)))
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .menuBarSettingsDidChange)) { _ in
@@ -71,13 +56,32 @@ struct MenuBarDateLabel: View {
                 for: Notification.Name("AppleInterfaceThemeChangedNotification")
             )
         ) { _ in
-            renderLabelImage()
+            refresh(force: true)
+        }
+        // 位图按主屏缩放比渲染；文案不变时不会重绘，切换 / 插拔显示器时需主动刷新清晰度。
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.didChangeScreenParametersNotification)) { _ in
+            refresh(force: true)
         }
     }
 
+    /// 对齐到下一个整秒 / 整分钟，分钟数准点跳变（时区偏移均为整分钟，按参考时间取整即可）。
+    nonisolated static func delayUntilNextTick(interval: TimeInterval, now: Date = .now) -> TimeInterval {
+        let seconds = now.timeIntervalSinceReferenceDate
+        let next = (floor(seconds / interval) + 1) * interval
+        return next - seconds + 0.05
+    }
+
     @MainActor
-    private func renderLabelImage() {
-        let snapshot = metrics
+    private func reloadLayout() {
+        layout = MenuBarLabelLayout.current()
+        refresh(force: true)
+    }
+
+    @MainActor
+    private func refresh(force: Bool = false) {
+        let snapshot = MenuBarLabelMetrics.make(date: .now, layout: layout)
+        guard force || snapshot != renderedMetrics else { return }
+
         let renderer = ImageRenderer(
             content: MenuBarRenderedLabel(metrics: snapshot)
         )
@@ -87,6 +91,7 @@ struct MenuBarDateLabel: View {
 
         guard let image = renderer.nsImage else { return }
         image.isTemplate = true
+        renderedMetrics = snapshot
         labelImage = image
     }
 }

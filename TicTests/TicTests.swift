@@ -324,6 +324,16 @@ final class TicTests: XCTestCase {
         XCTAssertEqual(AppSettings.normalizedBlockOrder([.time, .time, .date]).prefix(2), [.time, .date])
     }
 
+    func testMenuBarTickAlignsToWallClock() {
+        // 12:00:30.5 → 下一整分钟 12:01:00；下一整秒 12:00:31（各加 0.05s 余量）
+        let base = Date(timeIntervalSinceReferenceDate: 60 * 60 * 24 * 1000 + 30.5)
+        XCTAssertEqual(MenuBarDateLabel.delayUntilNextTick(interval: 60, now: base), 29.55, accuracy: 0.001)
+        XCTAssertEqual(MenuBarDateLabel.delayUntilNextTick(interval: 1, now: base), 0.55, accuracy: 0.001)
+        // 恰在整分钟时等满一个周期，不会立刻重复触发
+        let onMinute = Date(timeIntervalSinceReferenceDate: 60 * 60 * 24 * 1000)
+        XCTAssertEqual(MenuBarDateLabel.delayUntilNextTick(interval: 60, now: onMinute), 60.05, accuracy: 0.001)
+    }
+
     func testMenuBarIconOnlyHasNoFallbackText() {
         let defaults = UserDefaults.standard
         let keys = [AppSettings.menuBarBlockOrderKey, AppSettings.menuBarEnabledBlocksKey]

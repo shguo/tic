@@ -38,6 +38,13 @@ enum BeijingCalendar {
         return "\(year)-\(twoDigit(month))-\(twoDigit(day))"
     }
 
+    /// `dateKey(_:)` 的逆运算：「2026-10-01」→ 东八区该日零点。
+    static func date(fromKey key: String) -> Date? {
+        let parts = key.split(separator: "-").compactMap { Int($0) }
+        guard parts.count == 3 else { return nil }
+        return gregorian.date(from: DateComponents(year: parts[0], month: parts[1], day: parts[2]))
+    }
+
     private static func twoDigit(_ value: Int) -> String {
         value < 10 ? "0\(value)" : "\(value)"
     }
