@@ -67,13 +67,13 @@ enum CalendarMonthBuilder {
             subtitles.append(DaySubtitle(text: term, kind: .solarTerm))
         }
         for festival in festivals {
-            subtitles.append(DaySubtitle(text: festival.cellTitle, kind: .festival))
+            subtitles.append(DaySubtitle(text: festival.name, kind: .festival))
         }
-        // 放假数据用全名（「中秋节」「清明节」），合并假期写作「国庆节、中秋节」；
-        // 其中任一节日已由同日节日 / 节气显示时不再追加。
+        // 放假数据的节日名（合并假期写作「国庆节、中秋节」）中任一已由同日节日显示，
+        // 或是同日节气加「节」（「清明」→「清明节」）时不再追加。
         if let subtitle = ann?.subtitle,
            !subtitle.split(separator: "、").contains(where: { name in
-               subtitles.contains { $0.text == name || $0.text + "节" == name }
+               subtitles.contains { $0.text == name || ($0.kind == .solarTerm && $0.text + "节" == name) }
            }),
            ann?.badge != .rest || isFirstAnnotatedHoliday(date, subtitle: subtitle) {
             subtitles.append(DaySubtitle(text: subtitle, kind: .festival))
@@ -190,7 +190,7 @@ enum CalendarMonthBuilder {
             where item.date >= start && item.date <= end && (includeWestern || item.festival.tier != .western) {
                 candidates.append(CalendarEventCandidate(
                     date: item.date,
-                    title: item.festival.eventTitle,
+                    title: item.festival.name,
                     dateLabel: ChineseCalendarSupport.upcomingDateLabel(for: item.date),
                     priority: 1,
                     kind: .festival

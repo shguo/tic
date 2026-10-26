@@ -19,16 +19,13 @@ enum FestivalRule: Sendable {
 }
 
 struct Festival: Sendable {
-    /// 月历格短名，如「元宵」
-    let cellTitle: String
-    /// 后续提醒中的全名，如「元宵节」
-    let eventTitle: String
+    /// 月历格与后续提醒共用的名称，统一用正式全名（「元宵节」而非「元宵」）。
+    let name: String
     let tier: FestivalTier
     let rule: FestivalRule
 
-    init(_ cellTitle: String, _ eventTitle: String? = nil, tier: FestivalTier, rule: FestivalRule) {
-        self.cellTitle = cellTitle
-        self.eventTitle = eventTitle ?? cellTitle
+    init(_ name: String, tier: FestivalTier, rule: FestivalRule) {
+        self.name = name
         self.tier = tier
         self.rule = rule
     }
@@ -62,15 +59,15 @@ enum FestivalCatalog {
         Festival("感恩节", tier: .western, rule: .nthWeekday(month: 11, weekday: 5, ordinal: 4)),
 
         Festival("春节", tier: .traditional, rule: .lunar(month: 1, day: 1)),
-        Festival("元宵", "元宵节", tier: .traditional, rule: .lunar(month: 1, day: 15)),
+        Festival("元宵节", tier: .traditional, rule: .lunar(month: 1, day: 15)),
         Festival("龙抬头", tier: .traditional, rule: .lunar(month: 2, day: 2)),
-        Festival("上巳", "上巳节", tier: .traditional, rule: .lunar(month: 3, day: 3)),
-        Festival("端午", "端午节", tier: .traditional, rule: .lunar(month: 5, day: 5)),
-        Festival("七夕", tier: .traditional, rule: .lunar(month: 7, day: 7)),
-        Festival("中元", "中元节", tier: .traditional, rule: .lunar(month: 7, day: 15)),
-        Festival("中秋", "中秋节", tier: .traditional, rule: .lunar(month: 8, day: 15)),
-        Festival("重阳", "重阳节", tier: .traditional, rule: .lunar(month: 9, day: 9)),
-        Festival("腊八", "腊八节", tier: .traditional, rule: .lunar(month: 12, day: 8)),
+        Festival("上巳节", tier: .traditional, rule: .lunar(month: 3, day: 3)),
+        Festival("端午节", tier: .traditional, rule: .lunar(month: 5, day: 5)),
+        Festival("七夕节", tier: .traditional, rule: .lunar(month: 7, day: 7)),
+        Festival("中元节", tier: .traditional, rule: .lunar(month: 7, day: 15)),
+        Festival("中秋节", tier: .traditional, rule: .lunar(month: 8, day: 15)),
+        Festival("重阳节", tier: .traditional, rule: .lunar(month: 9, day: 9)),
+        Festival("腊八节", tier: .traditional, rule: .lunar(month: 12, day: 8)),
         Festival("小年", tier: .traditional, rule: .lunar(month: 12, day: 23)),
         Festival("除夕", tier: .traditional, rule: .lunarNewYearEve),
     ]

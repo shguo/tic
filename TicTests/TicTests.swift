@@ -40,7 +40,7 @@ final class TicTests: XCTestCase {
 
     func testLunarFestivalLanternFestival2026() {
         // 正月十五（元宵）= 2026-03-03，非法定假日，应由农历推算得到
-        XCTAssertEqual(CalendarMonthBuilder.cellSubtitle(for: gregorianDate(2026, 3, 3)), "元宵")
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitle(for: gregorianDate(2026, 3, 3)), "元宵节")
     }
 
     func testLunarNewYearEve2026() {
@@ -117,7 +117,7 @@ final class TicTests: XCTestCase {
         }
         XCTAssertEqual(subtitle(2026, 10, 1), DaySubtitle(text: "国庆节", kind: .festival))
         XCTAssertEqual(subtitle(2026, 10, 8), DaySubtitle(text: "寒露", kind: .solarTerm))
-        XCTAssertEqual(subtitle(2026, 10, 18), DaySubtitle(text: "重阳", kind: .festival))
+        XCTAssertEqual(subtitle(2026, 10, 18), DaySubtitle(text: "重阳节", kind: .festival))
         XCTAssertEqual(subtitle(2026, 10, 16), DaySubtitle(text: "初七", kind: .lunarDay))
         // 农历月首显示月名，闰月带「闰」
         XCTAssertEqual(subtitle(2026, 10, 10), DaySubtitle(text: "九月", kind: .lunarMonthStart))
@@ -143,8 +143,8 @@ final class TicTests: XCTestCase {
 
     func testHolidayNameNotDuplicatedWithFestival() {
         // 放假数据的「中秋节」「端午节」「清明节」与农历节日 / 节气同日时只显示一次
-        XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 9, 25)), ["中秋"])
-        XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 6, 19)), ["端午"])
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 9, 25)), ["中秋节"])
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 6, 19)), ["端午节"])
         XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2025, 4, 4)), ["清明"])
         // 2025 国庆中秋合并放假，数据名为「国庆节、中秋节」
         XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2025, 10, 1)), ["国庆节"])
@@ -155,7 +155,7 @@ final class TicTests: XCTestCase {
         XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 3, 12)).contains("植树节"))
         XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 7, 1)).contains("建党节"))
         // 2026 农历三月初三 = 4 月 19 日；11 月第 4 个周四 = 11 月 26 日
-        XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 4, 19)).contains("上巳"))
+        XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 4, 19)).contains("上巳节"))
         XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 11, 26)).contains("感恩节"))
         // 已移除的国际日
         XCTAssertFalse(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 5, 8)).contains("微笑日"))

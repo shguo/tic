@@ -68,7 +68,7 @@ Holiday/HolidayStore.swift
 
 Festival/FestivalCatalog.swift · Festival/FestivalCalendar.swift
 
-`FestivalCatalog.all` 是节日唯一来源，每项含短名 / 全名、分档（`traditional` / `official` / `western`）与规则（`solar` 公历月日、`nthWeekday` 第 N 个星期几、`lunar` 农历月日、`lunarNewYearEve` 除夕）。官方节日对齐《全国年节及纪念日放假办法》与 Apple「中国大陆节假日」订阅，传统节日参考 tyme4j / LunarSwift；纪念日、国际日不收录。
+`FestivalCatalog.all` 是节日唯一来源，每项含名称（统一用正式全名，如「元宵节」）、分档（`traditional` / `official` / `western`）与规则（`solar` 公历月日、`nthWeekday` 第 N 个星期几、`lunar` 农历月日、`lunarNewYearEve` 除夕）。官方节日对齐《全国年节及纪念日放假办法》与 Apple「中国大陆节假日」订阅，传统节日参考 tyme4j / LunarSwift；纪念日、国际日不收录。
 
 `FestivalCalendar` 按公历年把目录展开成日期并缓存（`NSLock`），月历单日查询 `festivals(on:includeWestern:)` 与后续提醒 `festivals(in:)` 共用同一份结果。新增节日只改目录；新增规则类型加一个 `FestivalRule` case 并在 `computeYear` 处理。
 
@@ -78,13 +78,13 @@ Festival/FestivalCatalog.swift · Festival/FestivalCalendar.swift
 
 **输入日期** → **查调休** HolidayStore（休/班 + 节日名）→ **查节气** SolarTermSupport → **查节日** FestivalCalendar（公历在前、农历在后，含除夕）→ **兜底农历日**（初一 / 廿三…，农历月首显示月名）
 
-副标题顺序：**节气 → 节日 → 调休节日名**，多个时月历格轮播，皆空时回退到农历日。调休节日名只在连休首日显示；它是全名（「中秋节」「清明节」，合并假期如「国庆节、中秋节」），其中任一节日已由同日节日 / 节气以短名显示时不再追加。是否显示提示圆点由 `hasAnnotation` 决定（有休/班、节日或节气即为 true）。
+副标题顺序：**节气 → 节日 → 调休节日名**，多个时月历格轮播，皆空时回退到农历日。调休节日名只在连休首日显示；它是全名（「中秋节」「清明节」，合并假期如「国庆节、中秋节」），其中任一节日已由同日节日显示、或为同日节气加「节」（清明→清明节）时不再追加。是否显示提示圆点由 `hasAnnotation` 决定（有休/班、节日或节气即为 true）。
 
 ```
 // dayCellMetadata 摘要（已简化）
 if let term = solarTerm { subtitles.append(term) }                       // 节气
-for f in FestivalCalendar.festivals(on: date, ...) { subtitles.append(f.cellTitle) }
-if let s = ann?.subtitle, 未被同日短名覆盖, 连休首日 { subtitles.append(s) }  // 调休（HolidayStore）
+for f in FestivalCalendar.festivals(on: date, ...) { subtitles.append(f.name) }
+if let s = ann?.subtitle, 未被同日节日 / 节气覆盖, 连休首日 { subtitles.append(s) }  // 调休（HolidayStore）
 // 全空 → [lunarCellSubtitle(for: date)]
 ```
 
