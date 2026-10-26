@@ -71,6 +71,7 @@ enum AppSettings {
     /// 节日 / 节气已按颜色区分，标注圆点默认关闭（仍可在设置中打开）。
     static let showAnnotationDotsDefault = false
     static let showSolarTermsKey = "showSolarTerms"
+    static let showWesternFestivalsKey = "showWesternFestivals"
     static let showYiJiKey = "showYiJi"
     static let launchAtLoginKey = "launchAtLogin"
     static let legacyDateFormatStyleKey = "dateFormatStyle"

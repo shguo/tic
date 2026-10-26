@@ -55,30 +55,32 @@ enum ChineseCalendarSupport {
     // 法定节假日 / 调休（休/班）来自 `HolidayStore` 内置打包 JSON，不再内置硬编码表。
 
 
-    private static let solarFestivalTemplates: [(month: Int, day: Int, cellTitle: String, eventTitle: String)] = [
-        (1, 1, "元旦", "元旦"),
-        (2, 14, "情人节", "情人节"),
-        (3, 8, "妇女节", "妇女节"),
-        (5, 1, "劳动节", "劳动节"),
-        (5, 4, "青年节", "青年节"),
-        (5, 8, "微笑日", "世界微笑日"),
-        (5, 12, "护士节", "护士节"),
-        (5, 18, "博物馆日", "国际博物馆日"),
-        (5, 21, "国际茶日", "国际茶日"),
-        (6, 1, "儿童节", "儿童节"),
-        (6, 5, "环境日", "世界环境日"),
-        (8, 1, "建军节", "建军节"),
-        (9, 10, "教师节", "教师节"),
-        (10, 1, "国庆节", "国庆节"),
-        (12, 24, "平安夜", "平安夜"),
-        (12, 25, "圣诞节", "圣诞节"),
+    /// 公历固定节日。官方节日对齐《全国年节及纪念日放假办法》与 Apple「中国大陆节假日」订阅；
+    /// `isWestern` 为西方 / 流行节日，受设置「显示西方节日」控制。纪念日、国际日不收录。
+    private static let solarFestivalTemplates: [(month: Int, day: Int, cellTitle: String, eventTitle: String, isWestern: Bool)] = [
+        (1, 1, "元旦", "元旦", false),
+        (2, 14, "情人节", "情人节", true),
+        (3, 8, "妇女节", "妇女节", false),
+        (3, 12, "植树节", "植树节", false),
+        (4, 1, "愚人节", "愚人节", true),
+        (5, 1, "劳动节", "劳动节", false),
+        (5, 4, "青年节", "青年节", false),
+        (6, 1, "儿童节", "儿童节", false),
+        (7, 1, "建党节", "建党节", false),
+        (8, 1, "建军节", "建军节", false),
+        (9, 10, "教师节", "教师节", false),
+        (10, 1, "国庆节", "国庆节", false),
+        // 严格说 10/31 是万圣夜，国内日历习惯标「万圣节」。
+        (10, 31, "万圣节", "万圣节", true),
+        (12, 24, "平安夜", "平安夜", true),
+        (12, 25, "圣诞节", "圣诞节", true),
     ]
 
-    private static let solarFestivalLookup: [String: (cellTitle: String, eventTitle: String)] = {
+    private static let solarFestivalLookup: [String: (cellTitle: String, eventTitle: String, isWestern: Bool)] = {
         Dictionary(uniqueKeysWithValues: solarFestivalTemplates.map { template in
             (
                 monthDayKey(month: template.month, day: template.day),
-                (cellTitle: template.cellTitle, eventTitle: template.eventTitle)
+                (cellTitle: template.cellTitle, eventTitle: template.eventTitle, isWestern: template.isWestern)
             )
         })
     }()
@@ -88,6 +90,7 @@ enum ChineseCalendarSupport {
         (1, 1, "春节", "春节"),
         (1, 15, "元宵", "元宵节"),
         (2, 2, "龙抬头", "龙抬头"),
+        (3, 3, "上巳", "上巳节"),
         (5, 5, "端午", "端午节"),
         (7, 7, "七夕", "七夕"),
         (7, 15, "中元", "中元节"),
@@ -110,22 +113,33 @@ enum ChineseCalendarSupport {
         return DayAnnotation(subtitle: lunarDayLabel(for: date), badge: nil)
     }
 
-    static func cellSubtitle(for date: Date, showSolarTerms: Bool = true) -> String {
-        cellSubtitles(for: date, showSolarTerms: showSolarTerms).first ?? lunarDayLabel(for: date)
+    static func cellSubtitle(
+        for date: Date,
+        showSolarTerms: Bool = true,
+        showWesternFestivals: Bool = true
+    ) -> String {
+        cellSubtitles(for: date, showSolarTerms: showSolarTerms, showWesternFestivals: showWesternFestivals).first
+            ?? lunarDayLabel(for: date)
     }
 
-    static func cellSubtitles(for date: Date, showSolarTerms: Bool = true) -> [String] {
-        dayCellMetadata(for: date, showSolarTerms: showSolarTerms).subtitles.map(\.text)
+    static func cellSubtitles(
+        for date: Date,
+        showSolarTerms: Bool = true,
+        showWesternFestivals: Bool = true
+    ) -> [String] {
+        dayCellMetadata(for: date, showSolarTerms: showSolarTerms, showWesternFestivals: showWesternFestivals)
+            .subtitles.map(\.text)
     }
 
     private static func dayCellMetadata(
         for date: Date,
-        showSolarTerms: Bool
+        showSolarTerms: Bool,
+        showWesternFestivals: Bool
     ) -> (subtitles: [DaySubtitle], hasAnnotation: Bool, badge: DayBadge?) {
         var subtitles: [DaySubtitle] = []
         let ann = storedAnnotation(for: date)
         let solarTerm = showSolarTerms ? SolarTermSupport.name(for: date) : nil
-        let festival = solarFestival(for: date)
+        let festival = solarFestival(for: date, includeWestern: showWesternFestivals)
         let lunarFest = lunarFestival(for: date)
 
         if let term = solarTerm {
@@ -278,14 +292,20 @@ enum ChineseCalendarSupport {
     static func upcomingEvents(
         from date: Date,
         limit: Int = 3,
-        includeSolarTerms: Bool = true
+        includeSolarTerms: Bool = true,
+        includeWesternFestivals: Bool = true
     ) -> [CalendarUpcomingEvent] {
         let start = gregorian.startOfDay(for: date)
         let end = gregorian.date(byAdding: .day, value: 370, to: start) ?? start
         var candidates: [CalendarEventCandidate] = []
         candidates.reserveCapacity(includeSolarTerms ? 96 : 48)
 
-        appendSolarFestivalEvents(from: start, through: end, into: &candidates)
+        appendSolarFestivalEvents(
+            from: start,
+            through: end,
+            includeWestern: includeWesternFestivals,
+            into: &candidates
+        )
         appendLunarFestivalEvents(from: start, through: end, into: &candidates)
         if includeSolarTerms {
             appendSolarTermEvents(from: start, through: end, into: &candidates)
@@ -323,13 +343,17 @@ enum ChineseCalendarSupport {
     }
 
     static func monthSlots(for month: Date) -> [CalendarMonthSlot] {
-        monthSlots(for: month, showSolarTerms: true)
+        monthSlots(for: month, showSolarTerms: true, showWesternFestivals: true)
     }
 
     /// 月历固定 6 行 × 7 列；首尾按常见日历惯例用上月 / 下月日期补齐，切换月份时网格高度不变。
     static let monthGridSlotCount = 42
 
-    static func monthSlots(for month: Date, showSolarTerms: Bool) -> [CalendarMonthSlot] {
+    static func monthSlots(
+        for month: Date,
+        showSolarTerms: Bool,
+        showWesternFestivals: Bool = true
+    ) -> [CalendarMonthSlot] {
         let firstOfMonth = gregorian.date(from: gregorian.dateComponents([.year, .month], from: month))!
         let leading = mondayBasedLeadingBlankCount(
             weekdayOfFirst: gregorian.component(.weekday, from: firstOfMonth)
@@ -340,7 +364,11 @@ enum ChineseCalendarSupport {
             let date = gregorian.date(byAdding: .day, value: offset, to: gridStart)!
             let components = gregorian.dateComponents([.month, .day, .weekday], from: date)
             let weekday = components.weekday ?? 0
-            let metadata = dayCellMetadata(for: date, showSolarTerms: showSolarTerms)
+            let metadata = dayCellMetadata(
+                for: date,
+                showSolarTerms: showSolarTerms,
+                showWesternFestivals: showWesternFestivals
+            )
             return .day(
                 date,
                 key: dateKey(date),
@@ -477,13 +505,14 @@ enum ChineseCalendarSupport {
     private static func appendSolarFestivalEvents(
         from start: Date,
         through end: Date,
+        includeWestern: Bool,
         into candidates: inout [CalendarEventCandidate]
     ) {
         let startYear = gregorian.component(.year, from: start)
         let endYear = gregorian.component(.year, from: end)
 
         for year in startYear...endYear {
-            for template in solarFestivalTemplates {
+            for template in solarFestivalTemplates where includeWestern || !template.isWestern {
                 guard let date = gregorian.date(from: DateComponents(year: year, month: template.month, day: template.day)) else {
                     continue
                 }
@@ -498,7 +527,7 @@ enum ChineseCalendarSupport {
                 ))
             }
 
-            for event in dynamicSolarFestivals(in: year) {
+            for event in dynamicSolarFestivals(in: year) where includeWestern || !event.isWestern {
                 guard event.date >= start && event.date <= end else { continue }
 
                 candidates.append(CalendarEventCandidate(
@@ -533,16 +562,20 @@ enum ChineseCalendarSupport {
         }
     }
 
-    private static func solarFestival(for date: Date) -> (cellTitle: String, eventTitle: String)? {
+    private static func solarFestival(
+        for date: Date,
+        includeWestern: Bool = true
+    ) -> (cellTitle: String, eventTitle: String)? {
         let month = gregorian.component(.month, from: date)
         let day = gregorian.component(.day, from: date)
-        if let template = solarFestivalLookup[monthDayKey(month: month, day: day)] {
-            return template
+        if let template = solarFestivalLookup[monthDayKey(month: month, day: day)],
+           includeWestern || !template.isWestern {
+            return (template.cellTitle, template.eventTitle)
         }
 
         let year = gregorian.component(.year, from: date)
         return dynamicSolarFestivals(in: year).first {
-            gregorian.isDate($0.date, inSameDayAs: date)
+            (includeWestern || !$0.isWestern) && gregorian.isDate($0.date, inSameDayAs: date)
         }.map {
             ($0.cellTitle, $0.eventTitle)
         }
@@ -550,13 +583,16 @@ enum ChineseCalendarSupport {
 
     private static func dynamicSolarFestivals(
         in year: Int
-    ) -> [(date: Date, cellTitle: String, eventTitle: String)] {
-        var result: [(date: Date, cellTitle: String, eventTitle: String)] = []
+    ) -> [(date: Date, cellTitle: String, eventTitle: String, isWestern: Bool)] {
+        var result: [(date: Date, cellTitle: String, eventTitle: String, isWestern: Bool)] = []
         if let mother = nthWeekdayDate(year: year, month: 5, weekday: 1, ordinal: 2) {
-            result.append((mother, "母亲节", "母亲节"))
+            result.append((mother, "母亲节", "母亲节", true))
         }
         if let father = nthWeekdayDate(year: year, month: 6, weekday: 1, ordinal: 3) {
-            result.append((father, "父亲节", "父亲节"))
+            result.append((father, "父亲节", "父亲节", true))
+        }
+        if let thanksgiving = nthWeekdayDate(year: year, month: 11, weekday: 5, ordinal: 4) {
+            result.append((thanksgiving, "感恩节", "感恩节", true))
         }
         return result
     }

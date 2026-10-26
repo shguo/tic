@@ -16,6 +16,7 @@ struct CalendarPopoverView: View {
     @AppStorage(AppSettings.appThemeKey) private var appThemeRaw = AppTheme.system.rawValue
     @AppStorage(AppSettings.showAnnotationDotsKey) private var showAnnotationDots = AppSettings.showAnnotationDotsDefault
     @AppStorage(AppSettings.showSolarTermsKey) private var showSolarTerms = true
+    @AppStorage(AppSettings.showWesternFestivalsKey) private var showWesternFestivals = true
     @AppStorage(AppSettings.showYiJiKey) private var showYiJi = true
 
     private let calendar: Calendar = {
@@ -30,14 +31,20 @@ struct CalendarPopoverView: View {
         let initialDay = calendar.startOfDay(for: initialDate)
         let year = calendar.component(.year, from: initialDay)
         let usesSolarTerms = UserDefaults.standard.object(forKey: AppSettings.showSolarTermsKey) as? Bool ?? true
+        let usesWesternFestivals = UserDefaults.standard.object(forKey: AppSettings.showWesternFestivalsKey) as? Bool ?? true
         _selectedDate = State(initialValue: initialDay)
         _displayedMonth = State(initialValue: initialDay)
         _pickerYear = State(initialValue: year)
-        _monthSlots = State(initialValue: ChineseCalendarSupport.monthSlots(for: initialDay, showSolarTerms: usesSolarTerms))
+        _monthSlots = State(initialValue: ChineseCalendarSupport.monthSlots(
+            for: initialDay,
+            showSolarTerms: usesSolarTerms,
+            showWesternFestivals: usesWesternFestivals
+        ))
         _upcomingEvents = State(initialValue: Self.upcomingListEvents(ChineseCalendarSupport.upcomingEvents(
             from: initialDay,
             limit: .max,
-            includeSolarTerms: usesSolarTerms
+            includeSolarTerms: usesSolarTerms,
+            includeWesternFestivals: usesWesternFestivals
         )))
     }
 
@@ -169,6 +176,9 @@ struct CalendarPopoverView: View {
             )
         }
         .onChange(of: showSolarTerms) {
+            refreshCalendarData(displayedMonth: displayedMonth, selectedDate: selectedDate)
+        }
+        .onChange(of: showWesternFestivals) {
             refreshCalendarData(displayedMonth: displayedMonth, selectedDate: selectedDate)
         }
         .background { monthKeyboardShortcuts }
@@ -304,7 +314,12 @@ struct CalendarPopoverView: View {
     }
 
     private func monthSlots(for month: Date) -> [CalendarMonthSlot] {
-        dataCache.monthSlots(for: month, showSolarTerms: showSolarTerms, calendar: calendar)
+        dataCache.monthSlots(
+            for: month,
+            showSolarTerms: showSolarTerms,
+            showWesternFestivals: showWesternFestivals,
+            calendar: calendar
+        )
     }
 
     /// 「后续提醒」可滚动（可见区域 3 行）：至少列出最近 3 条，另含 90 天内的全部节日 / 节气。
@@ -323,6 +338,7 @@ struct CalendarPopoverView: View {
             from: date,
             limit: .max,
             includeSolarTerms: showSolarTerms,
+            includeWesternFestivals: showWesternFestivals,
             calendar: calendar
         ))
     }

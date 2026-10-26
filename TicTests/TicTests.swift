@@ -138,6 +138,32 @@ final class TicTests: XCTestCase {
         XCTAssertEqual(label("重阳节"), "10月18日 | 九月初九 | 周日")
         XCTAssertEqual(label("霜降"), "10月23日 | 九月十四 | 周五")
         XCTAssertEqual(label("平安夜"), "12月24日 | 冬月十六 | 周四")
+        XCTAssertEqual(label("万圣节"), "10月31日 | 九月廿二 | 周六")
+    }
+
+    func testFestivalTiers() {
+        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 10, 31)).contains("万圣节"))
+        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 3, 12)).contains("植树节"))
+        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 7, 1)).contains("建党节"))
+        // 2026 农历三月初三 = 4 月 19 日；11 月第 4 个周四 = 11 月 26 日
+        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 4, 19)).contains("上巳"))
+        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 11, 26)).contains("感恩节"))
+        // 已移除的国际日
+        XCTAssertFalse(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 5, 8)).contains("微笑日"))
+
+        // 关闭西方节日：月历与后续提醒都不再出现，官方节日不受影响
+        XCTAssertFalse(ChineseCalendarSupport.cellSubtitles(
+            for: gregorianDate(2026, 10, 31), showWesternFestivals: false
+        ).contains("万圣节"))
+        XCTAssertFalse(ChineseCalendarSupport.cellSubtitles(
+            for: gregorianDate(2026, 11, 26), showWesternFestivals: false
+        ).contains("感恩节"))
+        let titles = ChineseCalendarSupport.upcomingEvents(
+            from: gregorianDate(2026, 10, 26), limit: .max, includeSolarTerms: false, includeWesternFestivals: false
+        ).map(\.title)
+        XCTAssertFalse(titles.contains("万圣节"))
+        XCTAssertFalse(titles.contains("圣诞节"))
+        XCTAssertTrue(titles.contains("元旦"))
     }
 
     // MARK: - 版本比较（检查更新）
