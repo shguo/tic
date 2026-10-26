@@ -61,10 +61,6 @@ enum SolarTermSupport {
             .byDate[gregorian.startOfDay(for: date)]
     }
 
-    static func hasTerm(on date: Date) -> Bool {
-        name(for: date) != nil
-    }
-
     static func date(of term: String, in year: Int) -> Date? {
         terms(forYear: year).byName[term]
     }

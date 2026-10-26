@@ -100,19 +100,6 @@ enum ChineseCalendarSupport {
         (12, 23, "小年", "小年"),
     ]
 
-    static func annotation(for date: Date) -> DayAnnotation {
-        if let stored = storedAnnotation(for: date) {
-            return stored
-        }
-        if let festival = solarFestival(for: date)?.cellTitle {
-            return DayAnnotation(subtitle: festival, badge: nil)
-        }
-        if let festival = lunarFestival(for: date)?.cellTitle {
-            return DayAnnotation(subtitle: festival, badge: nil)
-        }
-        return DayAnnotation(subtitle: lunarDayLabel(for: date), badge: nil)
-    }
-
     static func cellSubtitle(
         for date: Date,
         showSolarTerms: Bool = true,
@@ -167,7 +154,6 @@ enum ChineseCalendarSupport {
             }
         }
         let hasAnnotation = ann?.badge != nil
-            || ann?.subtitle.map(isSolarHoliday) == true
             || solarTerm != nil
             || festival != nil
             || lunarFest != nil
@@ -179,22 +165,8 @@ enum ChineseCalendarSupport {
         )
     }
 
-    static func solarTermName(for date: Date) -> String? {
-        SolarTermSupport.name(for: date)
-    }
-
-    static func hasAnnotation(for date: Date) -> Bool {
-        let ann = annotation(for: date)
-        if ann.badge != nil { return true }
-        if let subtitle = ann.subtitle, isSolarHoliday(subtitle) { return true }
-        if SolarTermSupport.hasTerm(on: date) { return true }
-        if solarFestival(for: date) != nil { return true }
-        if lunarFestival(for: date) != nil { return true }
-        return false
-    }
-
     static func badge(for date: Date) -> DayBadge? {
-        annotation(for: date).badge
+        storedAnnotation(for: date)?.badge
     }
 
     static func lunarMonthDayLabel(for date: Date) -> String {
@@ -264,12 +236,6 @@ enum ChineseCalendarSupport {
         case 1: return "明天"
         default: return "\(days)天后"
         }
-    }
-
-    static func nextFestivalCountdown(from date: Date) -> (name: String, days: Int)? {
-        upcomingEvents(from: date, limit: 1, includeSolarTerms: true)
-            .first
-            .map { ($0.title, $0.daysUntil) }
     }
 
     /// 距下一法定休首日（HolidayStore 中 badge 为「休」的首日）的天数；今天已是休假日则跳过当前连休。
@@ -417,10 +383,6 @@ enum ChineseCalendarSupport {
         default:
             return ""
         }
-    }
-
-    private static func isSolarHoliday(_ name: String) -> Bool {
-        ["元旦", "劳动节", "国庆", "清明", "端午", "中秋", "春节", "除夕"].contains(where: name.contains)
     }
 
     private static func sexagenaryMonthLabel(for date: Date) -> String {
