@@ -1,5 +1,15 @@
 import Foundation
 
+enum DayBadge: String {
+    case rest = "休"
+    case work = "班"
+}
+
+struct DayAnnotation {
+    var subtitle: String?
+    var badge: DayBadge?
+}
+
 /// 法定节假日 / 调休（休/班）数据源。
 ///
 /// 节气、农历、公历/农历节日都能本地推算；唯独「法定放假 / 调休」依赖国务院逐年公布，

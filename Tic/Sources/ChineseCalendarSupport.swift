@@ -1,47 +1,16 @@
 import Foundation
 import LunarSwift
 
-enum DayBadge: String {
-    case rest = "休"
-    case work = "班"
-}
-
-struct DayAnnotation {
-    var subtitle: String?
-    var badge: DayBadge?
-}
-
 /// 黄历当日宜 / 忌（传统择日，仅供参考）。
 struct DayYiJi: Equatable {
     let yi: [String]
     let ji: [String]
 }
 
+/// 农历文字、干支、宜忌与日期标签。节日见 `FestivalCalendar`，月历合并见 `CalendarMonthBuilder`。
 enum ChineseCalendarSupport {
-    private struct CalendarEventCandidate {
-        let date: Date
-        let title: String
-        let dateLabel: String
-        let priority: Int
-        let kind: DaySubtitleKind
-    }
-
-    /// 农历、节气、调休均以北京时间（东八区）为「当天」边界，与 LunarSwift / holiday-cn 一致。
-    private static let beijingTimeZone = TimeZone(identifier: "Asia/Shanghai") ?? .current
-
-    private static let gregorian: Calendar = {
-        var calendar = Calendar(identifier: .gregorian)
-        calendar.locale = Locale(identifier: "zh_CN")
-        calendar.timeZone = beijingTimeZone
-        // 与月历网格一致：周一为每周第一天（zh_CN 默认周日为首，此处显式对齐）。
-        calendar.firstWeekday = 2
-        return calendar
-    }()
-    private static let chinese: Calendar = {
-        var calendar = Calendar(identifier: .chinese)
-        calendar.timeZone = beijingTimeZone
-        return calendar
-    }()
+    private static let gregorian = BeijingCalendar.gregorian
+    private static let chinese = BeijingCalendar.chinese
 
     private static let heavenlyStems = ["甲", "乙", "丙", "丁", "戊", "己", "庚", "辛", "壬", "癸"]
     private static let earthlyBranches = ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
@@ -51,73 +20,6 @@ enum ChineseCalendarSupport {
         "七月", "八月", "九月", "十月", "冬月", "腊月",
     ]
     private static let digitNames = ["一", "二", "三", "四", "五", "六", "七", "八", "九", "十"]
-
-    // 法定节假日 / 调休（休/班）来自 `HolidayStore` 内置打包 JSON，不再内置硬编码表。
-
-
-    static func cellSubtitle(
-        for date: Date,
-        showSolarTerms: Bool = true,
-        showWesternFestivals: Bool = true
-    ) -> String {
-        cellSubtitles(for: date, showSolarTerms: showSolarTerms, showWesternFestivals: showWesternFestivals).first
-            ?? lunarDayLabel(for: date)
-    }
-
-    static func cellSubtitles(
-        for date: Date,
-        showSolarTerms: Bool = true,
-        showWesternFestivals: Bool = true
-    ) -> [String] {
-        dayCellMetadata(for: date, showSolarTerms: showSolarTerms, showWesternFestivals: showWesternFestivals)
-            .subtitles.map(\.text)
-    }
-
-    private static func dayCellMetadata(
-        for date: Date,
-        showSolarTerms: Bool,
-        showWesternFestivals: Bool
-    ) -> (subtitles: [DaySubtitle], hasAnnotation: Bool, badge: DayBadge?) {
-        var subtitles: [DaySubtitle] = []
-        let ann = storedAnnotation(for: date)
-        let solarTerm = showSolarTerms ? SolarTermSupport.name(for: date) : nil
-        let festivals = FestivalCalendar.festivals(on: date, includeWestern: showWesternFestivals)
-
-        if let term = solarTerm {
-            subtitles.append(DaySubtitle(text: term, kind: .solarTerm))
-        }
-        for festival in festivals {
-            subtitles.append(DaySubtitle(text: festival.cellTitle, kind: .festival))
-        }
-        // 放假数据用全名（「中秋节」「清明节」），合并假期写作「国庆节、中秋节」；
-        // 其中任一节日已由同日节日 / 节气显示时不再追加。
-        if let subtitle = ann?.subtitle,
-           !subtitle.split(separator: "、").contains(where: { name in
-               subtitles.contains { $0.text == name || $0.text + "节" == name }
-           }),
-           ann?.badge != .rest || isFirstAnnotatedHoliday(date, subtitle: subtitle) {
-            subtitles.append(DaySubtitle(text: subtitle, kind: .festival))
-        }
-
-        let unique = subtitles.reduce(into: [DaySubtitle]()) { result, subtitle in
-            if !result.contains(where: { $0.text == subtitle.text }) {
-                result.append(subtitle)
-            }
-        }
-        let hasAnnotation = ann?.badge != nil
-            || solarTerm != nil
-            || !festivals.isEmpty
-
-        return (
-            subtitles: unique.isEmpty ? [lunarCellSubtitle(for: date)] : unique,
-            hasAnnotation: hasAnnotation,
-            badge: ann?.badge
-        )
-    }
-
-    static func badge(for date: Date) -> DayBadge? {
-        storedAnnotation(for: date)?.badge
-    }
 
     static func lunarMonthDayLabel(for date: Date) -> String {
         let month = chinese.component(.month, from: date)
@@ -143,7 +45,7 @@ enum ChineseCalendarSupport {
     /// 宜忌由 LunarSwift 按「月干支 × 日干支」查《协纪辨方书》预编码表得出；无条目时为 ["无"]。
     @MainActor
     static func dayYiJi(for date: Date) -> DayYiJi {
-        let key = dateKey(date)
+        let key = BeijingCalendar.dateKey(date)
         if let cached = yiJiCache[key] {
             return cached
         }
@@ -180,131 +82,8 @@ enum ChineseCalendarSupport {
         }
     }
 
-    static func festivalCountdownLabel(days: Int) -> String {
-        switch days {
-        case 0: return "今天"
-        case 1: return "明天"
-        default: return "\(days)天后"
-        }
-    }
-
-    /// 距下一法定休首日（HolidayStore 中 badge 为「休」的首日）的天数；今天已是休假日则跳过当前连休。
-    static func nextRestDayCountdown(from date: Date) -> (name: String, days: Int)? {
-        let start = gregorian.startOfDay(for: date)
-        for offset in 0..<370 {
-            guard let candidate = gregorian.date(byAdding: .day, value: offset, to: start),
-                  let stored = storedAnnotation(for: candidate),
-                  stored.badge == .rest,
-                  let name = stored.subtitle,
-                  isFirstAnnotatedHoliday(candidate, subtitle: name)
-            else { continue }
-            if offset > 0 {
-                return (name, offset)
-            }
-        }
-        return nil
-    }
-
-    static func nextRestDayCountdownLabel(from date: Date) -> String? {
-        guard let next = nextRestDayCountdown(from: date) else { return nil }
-        return "\(next.name) \(festivalCountdownLabel(days: next.days))"
-    }
-
-    static func upcomingEvents(
-        from date: Date,
-        limit: Int = 3,
-        includeSolarTerms: Bool = true,
-        includeWesternFestivals: Bool = true
-    ) -> [CalendarUpcomingEvent] {
-        let start = gregorian.startOfDay(for: date)
-        let end = gregorian.date(byAdding: .day, value: 370, to: start) ?? start
-        var candidates: [CalendarEventCandidate] = []
-        candidates.reserveCapacity(includeSolarTerms ? 96 : 48)
-
-        appendFestivalEvents(
-            from: start,
-            through: end,
-            includeWestern: includeWesternFestivals,
-            into: &candidates
-        )
-        if includeSolarTerms {
-            appendSolarTermEvents(from: start, through: end, into: &candidates)
-        }
-
-        let unique = candidates
-            .filter { $0.date >= start && $0.date <= end }
-            .sorted {
-                if !gregorian.isDate($0.date, inSameDayAs: $1.date) {
-                    return $0.date < $1.date
-                }
-                return $0.priority < $1.priority
-            }
-            .reduce(into: [CalendarEventCandidate]()) { result, candidate in
-                let alreadyIncluded = result.contains {
-                    $0.title == candidate.title && gregorian.isDate($0.date, inSameDayAs: candidate.date)
-                }
-                if !alreadyIncluded {
-                    result.append(candidate)
-                }
-            }
-            .prefix(limit)
-
-        return unique.map { item in
-            let days = gregorian.dateComponents([.day], from: start, to: item.date).day ?? 0
-            return CalendarUpcomingEvent(
-                id: "\(dateKey(item.date))-\(item.title)",
-                title: item.title,
-                date: item.date,
-                daysUntil: days,
-                dateLabel: item.dateLabel,
-                kind: item.kind
-            )
-        }
-    }
-
-    static func monthSlots(for month: Date) -> [CalendarMonthSlot] {
-        monthSlots(for: month, showSolarTerms: true, showWesternFestivals: true)
-    }
-
-    /// 月历固定 6 行 × 7 列；首尾按常见日历惯例用上月 / 下月日期补齐，切换月份时网格高度不变。
-    static let monthGridSlotCount = 42
-
-    static func monthSlots(
-        for month: Date,
-        showSolarTerms: Bool,
-        showWesternFestivals: Bool = true
-    ) -> [CalendarMonthSlot] {
-        let firstOfMonth = gregorian.date(from: gregorian.dateComponents([.year, .month], from: month))!
-        let leading = mondayBasedLeadingBlankCount(
-            weekdayOfFirst: gregorian.component(.weekday, from: firstOfMonth)
-        )
-        let gridStart = gregorian.date(byAdding: .day, value: -leading, to: firstOfMonth)!
-
-        return (0..<monthGridSlotCount).map { offset in
-            let date = gregorian.date(byAdding: .day, value: offset, to: gridStart)!
-            let components = gregorian.dateComponents([.month, .day, .weekday], from: date)
-            let weekday = components.weekday ?? 0
-            let metadata = dayCellMetadata(
-                for: date,
-                showSolarTerms: showSolarTerms,
-                showWesternFestivals: showWesternFestivals
-            )
-            return .day(
-                date,
-                key: dateKey(date),
-                monthNumber: components.month ?? 0,
-                dayNumber: components.day ?? 0,
-                isWeekend: weekday == 1 || weekday == 7,
-                subtitles: metadata.subtitles,
-                hasAnnotation: metadata.hasAnnotation,
-                badge: metadata.badge,
-                isInDisplayedMonth: gregorian.isDate(date, equalTo: firstOfMonth, toGranularity: .month)
-            )
-        }
-    }
-
     /// 无节日 / 节气时的农历文字：月首显示月名（「九月」「闰六月」），其余显示农历日。
-    private static func lunarCellSubtitle(for date: Date) -> DaySubtitle {
+    static func lunarCellSubtitle(for date: Date) -> DaySubtitle {
         let components = chinese.dateComponents([.month, .day], from: date)
         guard components.day == 1, let month = components.month else {
             return DaySubtitle(text: lunarDayLabel(for: date), kind: .lunarDay)
@@ -397,69 +176,6 @@ enum ChineseCalendarSupport {
         SolarTermSupport.date(of: term, in: year)
     }
 
-    private static func appendFestivalEvents(
-        from start: Date,
-        through end: Date,
-        includeWestern: Bool,
-        into candidates: inout [CalendarEventCandidate]
-    ) {
-        let startYear = gregorian.component(.year, from: start)
-        let endYear = gregorian.component(.year, from: end)
-
-        for year in startYear...endYear {
-            for item in FestivalCalendar.festivals(in: year)
-            where item.date >= start && item.date <= end && (includeWestern || item.festival.tier != .western) {
-                candidates.append(CalendarEventCandidate(
-                    date: item.date,
-                    title: item.festival.eventTitle,
-                    dateLabel: upcomingDateLabel(for: item.date),
-                    priority: 1,
-                    kind: .festival
-                ))
-            }
-        }
-    }
-
-    private static func appendSolarTermEvents(
-        from start: Date,
-        through end: Date,
-        into candidates: inout [CalendarEventCandidate]
-    ) {
-        let startYear = gregorian.component(.year, from: start)
-        let endYear = gregorian.component(.year, from: end)
-
-        for year in startYear...endYear {
-            for term in SolarTermSupport.terms(in: year) where term.date >= start && term.date <= end {
-                candidates.append(CalendarEventCandidate(
-                    date: term.date,
-                    title: term.name,
-                    dateLabel: upcomingDateLabel(for: term.date),
-                    priority: 2,
-                    kind: .solarTerm
-                ))
-            }
-        }
-    }
-
-    /// 法定连休仅首日显示节日名；向前最多 14 天跳过数据缺口，避免缺前一天条目时重复显示。
-    private static func isFirstAnnotatedHoliday(_ date: Date, subtitle: String) -> Bool {
-        var cursor = date
-        for _ in 0..<14 {
-            guard let previousDate = gregorian.date(byAdding: .day, value: -1, to: cursor) else {
-                return true
-            }
-            cursor = previousDate
-            guard let previous = HolidayStore.shared.annotation(forKey: dateKey(previousDate)) else {
-                continue
-            }
-            if previous.badge == .rest && previous.subtitle == subtitle {
-                return false
-            }
-            return true
-        }
-        return true
-    }
-
     /// 「后续提醒」日期：所有类型统一为「公历 | 农历 | 星期」，如「10月18日 | 九月初九 | 周日」。
     static func upcomingDateLabel(for date: Date) -> String {
         let gregorianLabel = "\(gregorian.component(.month, from: date))月\(gregorian.component(.day, from: date))日"
@@ -470,27 +186,6 @@ enum ChineseCalendarSupport {
         let labels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"]
         let index = gregorian.component(.weekday, from: date) - 1
         return labels[safe: index] ?? ""
-    }
-
-    private static func storedAnnotation(for date: Date) -> DayAnnotation? {
-        HolidayStore.shared.annotation(forKey: dateKey(date))
-    }
-
-    private static func dateKey(_ date: Date) -> String {
-        let components = gregorian.dateComponents([.year, .month, .day], from: date)
-        let year = components.year ?? 0
-        let month = components.month ?? 0
-        let day = components.day ?? 0
-        return "\(year)-\(twoDigit(month))-\(twoDigit(day))"
-    }
-
-    private static func twoDigit(_ value: Int) -> String {
-        value < 10 ? "0\(value)" : "\(value)"
-    }
-
-    /// 月历网格周一为首列：`weekday` 为 `Calendar` 标准（1=周日 … 7=周六）。
-    private static func mondayBasedLeadingBlankCount(weekdayOfFirst: Int) -> Int {
-        positiveModulo(weekdayOfFirst + 5, 7)
     }
 
     private static func positiveModulo(_ value: Int, _ divisor: Int) -> Int {

@@ -30,22 +30,20 @@ struct CalendarPopoverView: View {
         calendar.locale = Locale(identifier: "zh_CN")
         let initialDay = calendar.startOfDay(for: initialDate)
         let year = calendar.component(.year, from: initialDay)
-        let usesSolarTerms = UserDefaults.standard.object(forKey: AppSettings.showSolarTermsKey) as? Bool ?? true
-        let usesWesternFestivals = UserDefaults.standard.object(forKey: AppSettings.showWesternFestivalsKey) as? Bool ?? true
+        let options = CalendarDisplayOptions.fromUserDefaults()
         _selectedDate = State(initialValue: initialDay)
         _displayedMonth = State(initialValue: initialDay)
         _pickerYear = State(initialValue: year)
-        _monthSlots = State(initialValue: ChineseCalendarSupport.monthSlots(
-            for: initialDay,
-            showSolarTerms: usesSolarTerms,
-            showWesternFestivals: usesWesternFestivals
-        ))
-        _upcomingEvents = State(initialValue: Self.upcomingListEvents(ChineseCalendarSupport.upcomingEvents(
+        _monthSlots = State(initialValue: CalendarMonthBuilder.monthSlots(for: initialDay, options: options))
+        _upcomingEvents = State(initialValue: Self.upcomingListEvents(CalendarMonthBuilder.upcomingEvents(
             from: initialDay,
             limit: .max,
-            includeSolarTerms: usesSolarTerms,
-            includeWesternFestivals: usesWesternFestivals
+            options: options
         )))
+    }
+
+    private var displayOptions: CalendarDisplayOptions {
+        CalendarDisplayOptions(showSolarTerms: showSolarTerms, showWesternFestivals: showWesternFestivals)
     }
 
     private var resolvedColorScheme: ColorScheme {
@@ -90,7 +88,7 @@ struct CalendarPopoverView: View {
 
     private var nextRestDayCountdownLabel: String? {
         guard relativeOffsetLabel == nil else { return nil }
-        return ChineseCalendarSupport.nextRestDayCountdownLabel(from: selectedDate)
+        return CalendarMonthBuilder.nextRestDayCountdownLabel(from: selectedDate)
     }
 
     var body: some View {
@@ -175,10 +173,7 @@ struct CalendarPopoverView: View {
                 onBecomeHidden: { resetSelectionToToday() }
             )
         }
-        .onChange(of: showSolarTerms) {
-            refreshCalendarData(displayedMonth: displayedMonth, selectedDate: selectedDate)
-        }
-        .onChange(of: showWesternFestivals) {
+        .onChange(of: displayOptions) {
             refreshCalendarData(displayedMonth: displayedMonth, selectedDate: selectedDate)
         }
         .background { monthKeyboardShortcuts }
@@ -314,12 +309,7 @@ struct CalendarPopoverView: View {
     }
 
     private func monthSlots(for month: Date) -> [CalendarMonthSlot] {
-        dataCache.monthSlots(
-            for: month,
-            showSolarTerms: showSolarTerms,
-            showWesternFestivals: showWesternFestivals,
-            calendar: calendar
-        )
+        dataCache.monthSlots(for: month, options: displayOptions, calendar: calendar)
     }
 
     /// 「后续提醒」可滚动（可见区域 3 行）：至少列出最近 3 条，另含 90 天内的全部节日 / 节气。
@@ -337,8 +327,7 @@ struct CalendarPopoverView: View {
         Self.upcomingListEvents(dataCache.upcomingEvents(
             from: date,
             limit: .max,
-            includeSolarTerms: showSolarTerms,
-            includeWesternFestivals: showWesternFestivals,
+            options: displayOptions,
             calendar: calendar
         ))
     }

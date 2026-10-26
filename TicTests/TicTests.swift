@@ -40,40 +40,40 @@ final class TicTests: XCTestCase {
 
     func testLunarFestivalLanternFestival2026() {
         // 正月十五（元宵）= 2026-03-03，非法定假日，应由农历推算得到
-        XCTAssertEqual(ChineseCalendarSupport.cellSubtitle(for: gregorianDate(2026, 3, 3)), "元宵")
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitle(for: gregorianDate(2026, 3, 3)), "元宵")
     }
 
     func testLunarNewYearEve2026() {
         // 除夕 = 2026-02-16（次日为正月初一），应优先于法定「春节」名显示
-        XCTAssertEqual(ChineseCalendarSupport.cellSubtitle(for: gregorianDate(2026, 2, 16)), "除夕")
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitle(for: gregorianDate(2026, 2, 16)), "除夕")
     }
 
     // MARK: - 法定节假日（HolidayStore 打包数据）
 
     func testBundledHolidayRestDay() {
-        XCTAssertEqual(ChineseCalendarSupport.badge(for: gregorianDate(2026, 10, 1)), .rest)
+        XCTAssertEqual(CalendarMonthBuilder.badge(for: gregorianDate(2026, 10, 1)), .rest)
     }
 
     func testBundledHolidayWorkDay() {
-        XCTAssertEqual(ChineseCalendarSupport.badge(for: gregorianDate(2026, 2, 28)), .work)
+        XCTAssertEqual(CalendarMonthBuilder.badge(for: gregorianDate(2026, 2, 28)), .work)
     }
 
     func testNextRestDayCountdownFromWorkDay() {
-        let result = ChineseCalendarSupport.nextRestDayCountdown(from: gregorianDate(2026, 6, 2))
+        let result = CalendarMonthBuilder.nextRestDayCountdown(from: gregorianDate(2026, 6, 2))
         XCTAssertEqual(result?.name, "端午节")
         XCTAssertEqual(result?.days, 17)
         XCTAssertEqual(
-            ChineseCalendarSupport.nextRestDayCountdownLabel(from: gregorianDate(2026, 6, 2)),
+            CalendarMonthBuilder.nextRestDayCountdownLabel(from: gregorianDate(2026, 6, 2)),
             "端午节 17天后"
         )
     }
 
     func testNextRestDayCountdownEve() {
-        XCTAssertEqual(ChineseCalendarSupport.nextRestDayCountdown(from: gregorianDate(2026, 6, 18))?.days, 1)
+        XCTAssertEqual(CalendarMonthBuilder.nextRestDayCountdown(from: gregorianDate(2026, 6, 18))?.days, 1)
     }
 
     func testNextRestDayCountdownSkipsCurrentRestPeriod() {
-        XCTAssertNil(ChineseCalendarSupport.nextRestDayCountdown(from: gregorianDate(2026, 10, 3)))
+        XCTAssertNil(CalendarMonthBuilder.nextRestDayCountdown(from: gregorianDate(2026, 10, 3)))
     }
 
     // MARK: - 边界与一致性
@@ -91,19 +91,19 @@ final class TicTests: XCTestCase {
 
     func testLunarFestivalWorksInDistantYear() {
         // 2030 年正月初一由农历推算，不依赖调休 JSON
-        XCTAssertEqual(ChineseCalendarSupport.cellSubtitle(for: gregorianDate(2030, 2, 3)), "春节")
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitle(for: gregorianDate(2030, 2, 3)), "春节")
     }
 
     func testMonthSlotsUseMondayAsFirstColumn() {
         // 2026-01-01 周四 → 周一首列前应空 3 格
-        let slots = ChineseCalendarSupport.monthSlots(for: gregorianDate(2026, 1, 1))
+        let slots = CalendarMonthBuilder.monthSlots(for: gregorianDate(2026, 1, 1))
         let firstDayIndex = slots.firstIndex { $0.dayNumber == 1 }
         XCTAssertEqual(firstDayIndex, 3)
     }
 
     func testNationalDaySubtitleOnlyOnFirstRestDay() {
-        let oct1 = ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 10, 1))
-        let oct2 = ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 10, 2))
+        let oct1 = CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 10, 1))
+        let oct2 = CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 10, 2))
         XCTAssertTrue(oct1.contains("国庆节"))
         XCTAssertFalse(oct2.contains("国庆节"))
     }
@@ -111,7 +111,7 @@ final class TicTests: XCTestCase {
     func testCellSubtitleKinds() {
         func subtitle(_ y: Int, _ m: Int, _ d: Int) -> DaySubtitle? {
             let date = gregorianDate(y, m, d)
-            return ChineseCalendarSupport.monthSlots(for: date, showSolarTerms: true)
+            return CalendarMonthBuilder.monthSlots(for: date)
                 .first { $0.isInDisplayedMonth && Calendar.gregorianChineseLocale.isDate($0.date, inSameDayAs: date) }?
                 .subtitles.first
         }
@@ -126,14 +126,14 @@ final class TicTests: XCTestCase {
 
     func testUpcomingEventKinds() {
         // 2027-02-01 之后：立春（节气）、除夕、春节（节日）
-        let events = ChineseCalendarSupport.upcomingEvents(from: gregorianDate(2027, 2, 1), limit: 3, includeSolarTerms: true)
+        let events = CalendarMonthBuilder.upcomingEvents(from: gregorianDate(2027, 2, 1), limit: 3)
         XCTAssertEqual(events.map(\.title), ["立春", "除夕", "春节"])
         XCTAssertEqual(events.map(\.kind), [.solarTerm, .festival, .festival])
     }
 
     func testUpcomingDateLabelShowsGregorianAndLunar() {
         // 公历节日、农历节日、节气统一为「公历 | 农历 | 星期」
-        let events = ChineseCalendarSupport.upcomingEvents(from: gregorianDate(2026, 10, 16), limit: .max, includeSolarTerms: true)
+        let events = CalendarMonthBuilder.upcomingEvents(from: gregorianDate(2026, 10, 16), limit: .max)
         func label(_ title: String) -> String? { events.first { $0.title == title }?.dateLabel }
         XCTAssertEqual(label("重阳节"), "10月18日 | 九月初九 | 周日")
         XCTAssertEqual(label("霜降"), "10月23日 | 九月十四 | 周五")
@@ -143,32 +143,32 @@ final class TicTests: XCTestCase {
 
     func testHolidayNameNotDuplicatedWithFestival() {
         // 放假数据的「中秋节」「端午节」「清明节」与农历节日 / 节气同日时只显示一次
-        XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 9, 25)), ["中秋"])
-        XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 6, 19)), ["端午"])
-        XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2025, 4, 4)), ["清明"])
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 9, 25)), ["中秋"])
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 6, 19)), ["端午"])
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2025, 4, 4)), ["清明"])
         // 2025 国庆中秋合并放假，数据名为「国庆节、中秋节」
-        XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2025, 10, 1)), ["国庆节"])
+        XCTAssertEqual(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2025, 10, 1)), ["国庆节"])
     }
 
     func testFestivalTiers() {
-        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 10, 31)).contains("万圣节"))
-        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 3, 12)).contains("植树节"))
-        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 7, 1)).contains("建党节"))
+        XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 10, 31)).contains("万圣节"))
+        XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 3, 12)).contains("植树节"))
+        XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 7, 1)).contains("建党节"))
         // 2026 农历三月初三 = 4 月 19 日；11 月第 4 个周四 = 11 月 26 日
-        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 4, 19)).contains("上巳"))
-        XCTAssertTrue(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 11, 26)).contains("感恩节"))
+        XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 4, 19)).contains("上巳"))
+        XCTAssertTrue(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 11, 26)).contains("感恩节"))
         // 已移除的国际日
-        XCTAssertFalse(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 5, 8)).contains("微笑日"))
+        XCTAssertFalse(CalendarMonthBuilder.cellSubtitles(for: gregorianDate(2026, 5, 8)).contains("微笑日"))
 
         // 关闭西方节日：月历与后续提醒都不再出现，官方节日不受影响
-        XCTAssertFalse(ChineseCalendarSupport.cellSubtitles(
-            for: gregorianDate(2026, 10, 31), showWesternFestivals: false
+        XCTAssertFalse(CalendarMonthBuilder.cellSubtitles(
+            for: gregorianDate(2026, 10, 31), options: .init(showWesternFestivals: false)
         ).contains("万圣节"))
-        XCTAssertFalse(ChineseCalendarSupport.cellSubtitles(
-            for: gregorianDate(2026, 11, 26), showWesternFestivals: false
+        XCTAssertFalse(CalendarMonthBuilder.cellSubtitles(
+            for: gregorianDate(2026, 11, 26), options: .init(showWesternFestivals: false)
         ).contains("感恩节"))
-        let titles = ChineseCalendarSupport.upcomingEvents(
-            from: gregorianDate(2026, 10, 26), limit: .max, includeSolarTerms: false, includeWesternFestivals: false
+        let titles = CalendarMonthBuilder.upcomingEvents(
+            from: gregorianDate(2026, 10, 26), limit: .max, options: .init(showSolarTerms: false, showWesternFestivals: false)
         ).map(\.title)
         XCTAssertFalse(titles.contains("万圣节"))
         XCTAssertFalse(titles.contains("圣诞节"))

@@ -10,16 +10,10 @@ final class CalendarSnapshotTests: XCTestCase {
         .deletingLastPathComponent()
         .appendingPathComponent("Fixtures/calendar-snapshot.txt")
 
-    private struct Options {
-        let label: String
-        let showSolarTerms: Bool
-        let showWesternFestivals: Bool
-    }
-
-    private static let options = [
-        Options(label: "default", showSolarTerms: true, showWesternFestivals: true),
-        Options(label: "noTerms", showSolarTerms: false, showWesternFestivals: true),
-        Options(label: "noWestern", showSolarTerms: true, showWesternFestivals: false),
+    private static let options: [(label: String, value: CalendarDisplayOptions)] = [
+        ("default", .default),
+        ("noTerms", CalendarDisplayOptions(showSolarTerms: false)),
+        ("noWestern", CalendarDisplayOptions(showWesternFestivals: false)),
     ]
 
     func testCalendarOutputMatchesSnapshot() throws {
@@ -59,11 +53,7 @@ final class CalendarSnapshotTests: XCTestCase {
             for month in 1...12 {
                 let firstOfMonth = calendar.date(from: DateComponents(year: year, month: month, day: 1))!
                 let rendered = options.map { option in
-                    ChineseCalendarSupport.monthSlots(
-                        for: firstOfMonth,
-                        showSolarTerms: option.showSolarTerms,
-                        showWesternFestivals: option.showWesternFestivals
-                    )
+                    CalendarMonthBuilder.monthSlots(for: firstOfMonth, options: option.value)
                     .filter(\.isInDisplayedMonth)
                     .map(render)
                 }
@@ -76,16 +66,15 @@ final class CalendarSnapshotTests: XCTestCase {
                 }
 
                 for option in options {
-                    let events = CalendarPopoverView.upcomingListEvents(ChineseCalendarSupport.upcomingEvents(
+                    let events = CalendarPopoverView.upcomingListEvents(CalendarMonthBuilder.upcomingEvents(
                         from: firstOfMonth,
                         limit: .max,
-                        includeSolarTerms: option.showSolarTerms,
-                        includeWesternFestivals: option.showWesternFestivals
+                        options: option.value
                     ))
                     let rendered = events.map { "\($0.title)(\($0.kind),+\($0.daysUntil),\($0.dateLabel))" }
                     lines.append("U \(year)-\(month) \(option.label): \(rendered.joined(separator: " "))")
                 }
-                let rest = ChineseCalendarSupport.nextRestDayCountdownLabel(from: firstOfMonth) ?? "-"
+                let rest = CalendarMonthBuilder.nextRestDayCountdownLabel(from: firstOfMonth) ?? "-"
                 lines.append("R \(year)-\(month): \(rest)")
             }
         }

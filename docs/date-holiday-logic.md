@@ -25,7 +25,7 @@
 当前实现如何计算公历 / 农历 / 干支 / 二十四节气 / 法定节假日与调休，以及存在哪些缺陷。
 
 生成 2026-06-01 · 缺陷清单已全部处理
-核心 ChineseCalendarSupport · SolarTermSupport · Holiday/HolidayStore
+核心 CalendarMonthBuilder · Festival/FestivalCatalog · Festival/FestivalCalendar · ChineseCalendarSupport · SolarTermSupport · Holiday/HolidayStore
 依赖 LunarSwift (SPM)
 面向：维护者 / Agent
 
@@ -39,8 +39,7 @@
 | 农历 年/月/日 + 闰月 | 系统 `Calendar(.chinese)` | 任意 | 苹果内置算法 |
 | 干支（年/月/日）+ 生肖 | 年/月自实现 + 日柱 **LunarSwift** | 任意 | 日柱已改库计算 |
 | 二十四节气 | **LunarSwift** 天文算法 | 任意 | 已替换硬编码；并修复漏「冬至」别名 bug |
-| 公历固定/动态节日 | 自实现表 + 第 n 个周几 | 任意 | 元旦、劳动节、国庆、儿童节、母亲节… |
-| 农历传统节日（春节/端午/中秋…） | **由 `.chinese` 农历推算**（含除夕） | **任意** | 缺陷②已修复 |
+| 公历 / 农历节日 | **`FestivalCatalog` 单一目录**，`FestivalCalendar` 按年推算（农历由 `.chinese` 换算，含除夕） | 任意 | 分传统 / 官方 / 西方三档，西方节日可在设置关闭 |
 | **法定节假日 / 调休（休/班）** | **`HolidayStore`**：打包 JSON + 联网 holiday-cn | **打包 2024–2026 + 联网当年/次年** | 缺陷①已修复 |
 
 **更新（2026-06-01）：严重与中等缺陷均已修复。**农历传统节日改由 `.chinese` 本地推算；法定调休改由 Holiday/HolidayStore.swift；日柱改 LunarSwift；农历/节气统一 `Asia/Shanghai`；节气缓存加锁。详见 [已修复](#fixed)。
@@ -49,7 +48,7 @@
 
 ### ① 系统日历
 
-ChineseCalendarSupport.swift
+BeijingCalendar.swift
 
 `gregorian`（locale `zh_CN`，时区 `Asia/Shanghai`）负责公历换算；`chinese`（同东八区）负责农历年/月/日与 `isLeapMonth`。与 LunarSwift、`HolidayStore` 的「当天」边界一致。
 
@@ -65,50 +64,28 @@ Holiday/HolidayStore.swift
 
 打包 `Resources/holidays/{2024,2025,2026}.json` 兜底 + 启动联网 holiday-cn（jsDelivr 主、GitHub raw 备）刷新当年/次年，缓存到 Application Support。归一为 `DayAnnotation`（休/班 + 节日名），`NSLock` 保护。
 
-### ④ 公历节日表
+### ④ 节日目录
 
-ChineseCalendarSupport.swift:118–133, 579–590
+Festival/FestivalCatalog.swift · Festival/FestivalCalendar.swift
 
-固定日期节日（元旦、情人节、妇女节、青年节、儿童节、教师节、圣诞…）+ 动态节日（母亲节=5 月第 2 个周日、父亲节=6 月第 3 个周日），均可任意年份计算。
+`FestivalCatalog.all` 是节日唯一来源，每项含短名 / 全名、分档（`traditional` / `official` / `western`）与规则（`solar` 公历月日、`nthWeekday` 第 N 个星期几、`lunar` 农历月日、`lunarNewYearEve` 除夕）。官方节日对齐《全国年节及纪念日放假办法》与 Apple「中国大陆节假日」订阅，传统节日参考 tyme4j / LunarSwift；纪念日、国际日不收录。
+
+`FestivalCalendar` 按公历年把目录展开成日期并缓存（`NSLock`），月历单日查询 `festivals(on:includeWestern:)` 与后续提醒 `festivals(in:)` 共用同一份结果。新增节日只改目录；新增规则类型加一个 `FestivalRule` case 并在 `computeYear` 处理。
 
 ## 数据流：一个日期是怎么变成日历里一格的
 
-月历每格内容由 `dayCellMetadata(for:showSolarTerms:)` 汇总 ChineseCalendarSupport.swift:185–220：
+月历每格内容由 `CalendarMonthBuilder.dayCellMetadata(for:options:)` 汇总（CalendarMonthBuilder.swift），`options` 为 `CalendarDisplayOptions`（显示节气 / 显示西方节日）：
 
-**输入日期**Date
+**输入日期** → **查调休** HolidayStore（休/班 + 节日名）→ **查节气** SolarTermSupport → **查节日** FestivalCalendar（公历在前、农历在后，含除夕）→ **兜底农历日**（初一 / 廿三…，农历月首显示月名）
 
-→
-
-**查调休**HolidayStore
-休/班 + 节日名
-
-→
-
-**查节气**SolarTermSupport
-LunarSwift
-
-→
-
-**公历节日**solarFestival()
-
-→
-
-**农历节日**lunarFestival()
-含除夕
-
-→
-
-**兜底农历日**初一 / 廿三…
-
-副标题优先级：**节气 → 公历节日 → 农历节日 → 调休节日名**，皆空时回退到农历日（除夕优先于法定「春节」名显示）。是否显示提示圆点由 `hasAnnotation` 决定（有 badge、法定/公历/农历节日或节气即为 true）。
+副标题顺序：**节气 → 节日 → 调休节日名**，多个时月历格轮播，皆空时回退到农历日。调休节日名只在连休首日显示；它是全名（「中秋节」「清明节」，合并假期如「国庆节、中秋节」），其中任一节日已由同日节日 / 节气以短名显示时不再追加。是否显示提示圆点由 `hasAnnotation` 决定（有休/班、节日或节气即为 true）。
 
 ```
 // dayCellMetadata 摘要（已简化）
-if let term = solarTerm { subtitles.append(term) }              // 节气
-if let f = festival?.cellTitle { subtitles.append(f) }          // 公历节日
-if let f = lunarFest?.cellTitle { subtitles.append(f) }         // 农历节日（含除夕）
-if let s = ann?.subtitle { subtitles.append(s) }               // 调休（HolidayStore）
-// 全空 → [lunarDayLabel(for: date)]（农历日）
+if let term = solarTerm { subtitles.append(term) }                       // 节气
+for f in FestivalCalendar.festivals(on: date, ...) { subtitles.append(f.cellTitle) }
+if let s = ann?.subtitle, 未被同日短名覆盖, 连休首日 { subtitles.append(s) }  // 调休（HolidayStore）
+// 全空 → [lunarCellSubtitle(for: date)]
 ```
 
 ## 模块 A · 菜单栏日期 / 时间
@@ -123,7 +100,7 @@ MenuBarDisplayComposer.swift · MenuBarLabelMetrics.swift
 
 ## 模块 B · 农历与干支
 
-ChineseCalendarSupport.swift:239–258, 413–492
+ChineseCalendarSupport.swift
 
 * **农历日 / 月日**：直接取 `chinese` 日历的 `.day` / `.month` + `isLeapMonth`，映射到「初一…三十」「正月…腊月」，闰月加「闰」前缀。**苹果算法，任意年份。**
 * **干支年** + 生肖：基于 `chinese.year` 在 60 甲子里取干支。
@@ -150,27 +127,27 @@ for (key, solar) in lunar.jieQiTable {
 
 ## 模块 D · 节日与倒计时
 
-ChineseCalendarSupport.swift
+CalendarMonthBuilder.swift
 
-`upcomingEvents(from:limit:)` 在 **start … start+370 天**窗口内汇集候选并排序。**已改为全部本地推算**（不再依赖调休数据），任意年份都有倒计时：
+`upcomingEvents(from:limit:options:)` 在 **start … start+370 天**窗口内汇集候选并排序，全部本地推算，不依赖调休数据：
 
 | 来源 | priority | 取自 |
 | --- | --- | --- |
-| 公历节日（固定 + 动态） | 1 | `solarFestivalTemplates`（含元旦/劳动节/国庆）+ 母亲/父亲节 |
-| 农历节日 | 1 | `appendLunarFestivalEvents`（春节/端午/中秋/元宵/七夕… 按农历日期） |
-| 二十四节气 | 2 | `SolarTermSupport.terms(in:)` |
+| 节日（公历 / 农历 / 除夕） | 1 | `FestivalCalendar.festivals(in:)`（关闭西方节日时过滤 `western` 档） |
+| 二十四节气 | 2 | `SolarTermSupport.terms(in:)`（关闭节气时不加入） |
 
-同名同日去重后取 `limit` 个；「下一个节日倒计时」即 `limit=1`。倒计时文案：今天 / 明天 / N 天后。
+同名同日去重后取 `limit` 个。倒计时锚定**节日规范日**（春节=正月初一、国庆=10/1 等），任意年份有效。
 
-改动：原先「法定节日（放假首日）」候选来自硬编码字典、止于 2027；现倒计时锚定**节日规范日**（春节=正月初一、国庆=10/1 等），任意年份有效。休/班角标仍由 `HolidayStore` 提供。
+头部「距下个假期」由 `nextRestDayCountdown(from:)` 计算：取 `HolidayStore` 中下一个连休首日，依赖打包的放假数据，数据未覆盖的年份不显示。
 
 ## 模块 E · 月历网格与缓存
 
-ChineseCalendarSupport.swift:341–411 · CalendarPopoverDataCache.swift
+CalendarMonthBuilder.swift · CalendarPopoverDataCache.swift
 
-* **月历网格**：`monthSlots(for:showSolarTerms:)`，**周一为首列**（`mondayBasedLeadingBlankCount`），每格带 subtitles / badge / hasAnnotation。
-* **周数**：`weekOfYear` 与网格共用同一 `gregorian` 日历（`firstWeekday = 2`）。
-* **缓存**：`CalendarPopoverDataCache` 对 monthSlots（上限 18）与 upcomingEvents（上限 90）做 LRU；节气按年缓存。
+* **月历网格**：`monthSlots(for:options:)`，固定 6×7，**周一为首列**（`mondayBasedLeadingBlankCount`），首尾用上 / 下月日期补齐，每格带 subtitles / badge / hasAnnotation。
+* **周数**：`weekOfYear` 与网格共用 `BeijingCalendar.gregorian`（`firstWeekday = 2`）。
+* **缓存**：`CalendarPopoverDataCache` 以 `CalendarDisplayOptions` 为键的一部分，对 monthSlots（上限 18）与 upcomingEvents（上限 90）做 LRU；节日、节气均按年缓存。
+* **回归**：`TicTests/CalendarSnapshotTests` 逐日比对 2024–2030 的月历与后续提醒输出（fixture 在 `TicTests/Fixtures/`）；有意改变输出时删除 fixture 重新生成并检查 diff。
 
 ## 缺陷清单
 
@@ -291,4 +268,4 @@ ChineseCalendarSupport.swift:341–411 · CalendarPopoverDataCache.swift
 
 联网数据源的完整设计（统一模型、3 源冗余、CDN 兜底、缓存与隐私开关）见 docs/holiday-data-source.md。
 
-本文据 2026-06-01 工作区源码生成，文件行号以当时 Tic/Sources/ 为准；改动相关代码后请同步更新。
+本文据 2026-06-01 工作区源码生成，2026-10-26 节日重构后更新概览、数据来源、数据流与模块 B / D / E；缺陷清单为历史记录。改动相关代码后请同步更新。

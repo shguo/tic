@@ -18,8 +18,8 @@ final class CalendarPopoverLayoutTests: XCTestCase {
         for year in 2026...2027 {
             for month in 1...12 {
                 let date = calendar.date(from: DateComponents(year: year, month: month, day: 15))!
-                let slots = ChineseCalendarSupport.monthSlots(for: date, showSolarTerms: true)
-                XCTAssertEqual(slots.count, ChineseCalendarSupport.monthGridSlotCount, "\(year)-\(month)")
+                let slots = CalendarMonthBuilder.monthSlots(for: date)
+                XCTAssertEqual(slots.count, CalendarMonthBuilder.monthGridSlotCount, "\(year)-\(month)")
                 XCTAssertEqual(Set(slots.map(\.id)).count, slots.count, "格子 id 需唯一 \(year)-\(month)")
             }
         }
@@ -32,7 +32,7 @@ final class CalendarPopoverLayoutTests: XCTestCase {
         for year in 2026...2027 {
             for month in 1...12 {
                 let date = calendar.date(from: DateComponents(year: year, month: month, day: 15))!
-                let slots = ChineseCalendarSupport.monthSlots(for: date, showSolarTerms: true)
+                let slots = CalendarMonthBuilder.monthSlots(for: date)
                 let dates = slots.map(\.date)
                 XCTAssertEqual(calendar.component(.weekday, from: dates[0]), 2, "首格应为周一 \(year)-\(month)")
                 for (prev, next) in zip(dates, dates.dropFirst()) {
@@ -115,7 +115,7 @@ final class CalendarPopoverLayoutTests: XCTestCase {
     func testUpcomingListHeightIsFixed() {
         let palette = CalendarPopoverTheme.palette(for: .light)
         let date = Calendar.gregorianChineseLocale.date(from: DateComponents(year: 2026, month: 10, day: 16))!
-        let events = ChineseCalendarSupport.upcomingEvents(from: date, limit: .max, includeSolarTerms: true)
+        let events = CalendarMonthBuilder.upcomingEvents(from: date, limit: .max)
         XCTAssertGreaterThan(events.count, 30, "一年内的节日 / 节气应全部可滚动查看")
         for count in [0, 1, 2, 3, 10, events.count] {
             let list = CalendarUpcomingListView(events: Array(events.prefix(count)), palette: palette)
@@ -127,7 +127,7 @@ final class CalendarPopoverLayoutTests: XCTestCase {
     func testUpcomingListCoversWindowWithMinimum() {
         let calendar = Calendar.gregorianChineseLocale
         let date = calendar.date(from: DateComponents(year: 2026, month: 10, day: 16))!
-        let all = ChineseCalendarSupport.upcomingEvents(from: date, limit: .max, includeSolarTerms: true)
+        let all = CalendarMonthBuilder.upcomingEvents(from: date, limit: .max)
         let list = CalendarPopoverView.upcomingListEvents(all)
         XCTAssertTrue(list.allSatisfy { $0.daysUntil <= CalendarPopoverView.upcomingWindowDays })
         XCTAssertEqual(list.count, all.filter { $0.daysUntil <= CalendarPopoverView.upcomingWindowDays }.count)

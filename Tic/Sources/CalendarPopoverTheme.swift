@@ -9,7 +9,7 @@ enum CalendarPopoverLayout {
     // 弹窗总高 `popoverHeight` 只取决于「显示宜忌」开关，切换月份时窗口与各区块都不改变尺寸。
     // 改动任何区块的字号 / 间距时同步改这里；`CalendarPopoverLayoutTests` 会校验与实际排版一致。
 
-    static let gridRows = ChineseCalendarSupport.monthGridSlotCount / 7
+    static let gridRows = CalendarMonthBuilder.monthGridSlotCount / 7
     static let gridCellHeight: CGFloat = 46
     static let gridRowSpacing: CGFloat = 10
     static let gridHeight = CGFloat(gridRows) * gridCellHeight + CGFloat(gridRows - 1) * gridRowSpacing

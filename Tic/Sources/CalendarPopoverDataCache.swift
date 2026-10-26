@@ -4,15 +4,13 @@ struct CalendarPopoverDataCache {
     private struct MonthSlotsKey: Hashable {
         let year: Int
         let month: Int
-        let showSolarTerms: Bool
-        let showWesternFestivals: Bool
+        let options: CalendarDisplayOptions
 
-        init(month date: Date, showSolarTerms: Bool, showWesternFestivals: Bool, calendar: Calendar) {
+        init(month date: Date, options: CalendarDisplayOptions, calendar: Calendar) {
             let components = calendar.dateComponents([.year, .month], from: date)
             self.year = components.year ?? 0
             self.month = components.month ?? 0
-            self.showSolarTerms = showSolarTerms
-            self.showWesternFestivals = showWesternFestivals
+            self.options = options
         }
     }
 
@@ -20,17 +18,15 @@ struct CalendarPopoverDataCache {
         let year: Int
         let month: Int
         let day: Int
-        let includeSolarTerms: Bool
-        let includeWesternFestivals: Bool
+        let options: CalendarDisplayOptions
         let limit: Int
 
-        init(date: Date, limit: Int, includeSolarTerms: Bool, includeWesternFestivals: Bool, calendar: Calendar) {
+        init(date: Date, limit: Int, options: CalendarDisplayOptions, calendar: Calendar) {
             let components = calendar.dateComponents([.year, .month, .day], from: date)
             self.year = components.year ?? 0
             self.month = components.month ?? 0
             self.day = components.day ?? 0
-            self.includeSolarTerms = includeSolarTerms
-            self.includeWesternFestivals = includeWesternFestivals
+            self.options = options
             self.limit = limit
         }
     }
@@ -42,26 +38,16 @@ struct CalendarPopoverDataCache {
 
     mutating func monthSlots(
         for month: Date,
-        showSolarTerms: Bool,
-        showWesternFestivals: Bool,
+        options: CalendarDisplayOptions,
         calendar: Calendar
     ) -> [CalendarMonthSlot] {
-        let key = MonthSlotsKey(
-            month: month,
-            showSolarTerms: showSolarTerms,
-            showWesternFestivals: showWesternFestivals,
-            calendar: calendar
-        )
+        let key = MonthSlotsKey(month: month, options: options, calendar: calendar)
         if let cached = monthSlotsByKey[key] {
             touch(key, in: &monthSlotsOrder)
             return cached
         }
 
-        let slots = ChineseCalendarSupport.monthSlots(
-            for: month,
-            showSolarTerms: showSolarTerms,
-            showWesternFestivals: showWesternFestivals
-        )
+        let slots = CalendarMonthBuilder.monthSlots(for: month, options: options)
         monthSlotsByKey[key] = slots
         remember(key, in: &monthSlotsOrder, cache: &monthSlotsByKey, limit: 18)
         return slots
@@ -70,15 +56,13 @@ struct CalendarPopoverDataCache {
     mutating func upcomingEvents(
         from date: Date,
         limit: Int,
-        includeSolarTerms: Bool,
-        includeWesternFestivals: Bool,
+        options: CalendarDisplayOptions,
         calendar: Calendar
     ) -> [CalendarUpcomingEvent] {
         let key = UpcomingEventsKey(
             date: calendar.startOfDay(for: date),
             limit: limit,
-            includeSolarTerms: includeSolarTerms,
-            includeWesternFestivals: includeWesternFestivals,
+            options: options,
             calendar: calendar
         )
         if let cached = upcomingEventsByKey[key] {
@@ -86,12 +70,7 @@ struct CalendarPopoverDataCache {
             return cached
         }
 
-        let events = ChineseCalendarSupport.upcomingEvents(
-            from: date,
-            limit: limit,
-            includeSolarTerms: includeSolarTerms,
-            includeWesternFestivals: includeWesternFestivals
-        )
+        let events = CalendarMonthBuilder.upcomingEvents(from: date, limit: limit, options: options)
         upcomingEventsByKey[key] = events
         remember(key, in: &upcomingEventsOrder, cache: &upcomingEventsByKey, limit: 90)
         return events
