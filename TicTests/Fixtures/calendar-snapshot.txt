@@ -775,7 +775,7 @@ U 2025-9 default: 中元节(festival,+5,9月6日 | 七月十五 | 周六) 白露
 U 2025-9 noTerms: 中元节(festival,+5,9月6日 | 七月十五 | 周六) 教师节(festival,+9,9月10日 | 七月十九 | 周三) 国庆节(festival,+30,10月1日 | 八月初十 | 周三) 中秋节(festival,+35,10月6日 | 八月十五 | 周一) 重阳节(festival,+58,10月29日 | 九月初九 | 周三) 万圣节(festival,+60,10月31日 | 九月十一 | 周五) 感恩节(festival,+87,11月27日 | 十月初八 | 周四)
 U 2025-9 noWestern: 中元节(festival,+5,9月6日 | 七月十五 | 周六) 白露(solarTerm,+6,9月7日 | 七月十六 | 周日) 教师节(festival,+9,9月10日 | 七月十九 | 周三) 秋分(solarTerm,+22,9月23日 | 八月初二 | 周二) 国庆节(festival,+30,10月1日 | 八月初十 | 周三) 中秋节(festival,+35,10月6日 | 八月十五 | 周一) 寒露(solarTerm,+37,10月8日 | 八月十七 | 周三) 霜降(solarTerm,+52,10月23日 | 九月初三 | 周四) 重阳节(festival,+58,10月29日 | 九月初九 | 周三) 立冬(solarTerm,+67,11月7日 | 九月十八 | 周五) 小雪(solarTerm,+82,11月22日 | 十月初三 | 周六)
 R 2025-9: 国庆节、中秋节 30天后
-D 2025-10-01 国庆节:festival,国庆节、中秋节:festival badge=休 mark=1
+D 2025-10-01 国庆节:festival badge=休 mark=1
 D 2025-10-02 十一:lunarDay badge=休 mark=1
 D 2025-10-03 十二:lunarDay badge=休 mark=1
 D 2025-10-04 十三:lunarDay badge=休 mark=1

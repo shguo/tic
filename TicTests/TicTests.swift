@@ -146,6 +146,8 @@ final class TicTests: XCTestCase {
         XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 9, 25)), ["中秋"])
         XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2026, 6, 19)), ["端午"])
         XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2025, 4, 4)), ["清明"])
+        // 2025 国庆中秋合并放假，数据名为「国庆节、中秋节」
+        XCTAssertEqual(ChineseCalendarSupport.cellSubtitles(for: gregorianDate(2025, 10, 1)), ["国庆节"])
     }
 
     func testFestivalTiers() {
