@@ -73,7 +73,9 @@ final class TicTests: XCTestCase {
     }
 
     func testNextRestDayCountdownSkipsCurrentRestPeriod() {
-        XCTAssertNil(CalendarMonthBuilder.nextRestDayCountdown(from: gregorianDate(2026, 10, 3)))
+        let result = CalendarMonthBuilder.nextRestDayCountdown(from: gregorianDate(2026, 10, 3))
+        XCTAssertEqual(result?.name, "元旦")
+        XCTAssertEqual(result?.days, 90)
     }
 
     // MARK: - 边界与一致性
@@ -401,9 +403,9 @@ final class TicTests: XCTestCase {
     // MARK: - HolidayStore 覆盖年份
 
     func testHolidayStoreReportsBundledCoverage() {
-        XCTAssertEqual(HolidayStore.shared.maxCoveredYear, 2026)
-        XCTAssertFalse(HolidayStore.shared.isYearUncovered(2026))
-        XCTAssertTrue(HolidayStore.shared.isYearUncovered(2027))
+        XCTAssertEqual(HolidayStore.shared.maxCoveredYear, 2027)
+        XCTAssertFalse(HolidayStore.shared.isYearUncovered(2027))
+        XCTAssertTrue(HolidayStore.shared.isYearUncovered(2028))
         XCTAssertTrue(HolidayStore.shared.isYearUncovered(2023))
     }
 

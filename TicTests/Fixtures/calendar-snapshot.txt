@@ -1257,7 +1257,7 @@ D 2026-10-31 万圣节:festival badge=- mark=1
 U 2026-10 default: 国庆节(festival,+0,10月1日 | 八月廿一 | 周四) 寒露(solarTerm,+7,10月8日 | 八月廿八 | 周四) 重阳节(festival,+17,10月18日 | 九月初九 | 周日) 霜降(solarTerm,+22,10月23日 | 九月十四 | 周五) 万圣节(festival,+30,10月31日 | 九月廿二 | 周六) 立冬(solarTerm,+37,11月7日 | 九月廿九 | 周六) 小雪(solarTerm,+52,11月22日 | 十月十四 | 周日) 感恩节(festival,+56,11月26日 | 十月十八 | 周四) 大雪(solarTerm,+67,12月7日 | 十月廿九 | 周一) 冬至(solarTerm,+82,12月22日 | 冬月十四 | 周二) 平安夜(festival,+84,12月24日 | 冬月十六 | 周四) 圣诞节(festival,+85,12月25日 | 冬月十七 | 周五)
 U 2026-10 noTerms: 国庆节(festival,+0,10月1日 | 八月廿一 | 周四) 重阳节(festival,+17,10月18日 | 九月初九 | 周日) 万圣节(festival,+30,10月31日 | 九月廿二 | 周六) 感恩节(festival,+56,11月26日 | 十月十八 | 周四) 平安夜(festival,+84,12月24日 | 冬月十六 | 周四) 圣诞节(festival,+85,12月25日 | 冬月十七 | 周五)
 U 2026-10 noWestern: 国庆节(festival,+0,10月1日 | 八月廿一 | 周四) 寒露(solarTerm,+7,10月8日 | 八月廿八 | 周四) 重阳节(festival,+17,10月18日 | 九月初九 | 周日) 霜降(solarTerm,+22,10月23日 | 九月十四 | 周五) 立冬(solarTerm,+37,11月7日 | 九月廿九 | 周六) 小雪(solarTerm,+52,11月22日 | 十月十四 | 周日) 大雪(solarTerm,+67,12月7日 | 十月廿九 | 周一) 冬至(solarTerm,+82,12月22日 | 冬月十四 | 周二)
-R 2026-10: -
+R 2026-10: 元旦 92天后
 D 2026-11-01 廿三:lunarDay badge=- mark=0
 D 2026-11-02 廿四:lunarDay badge=- mark=0
 D 2026-11-03 廿五:lunarDay badge=- mark=0
@@ -1294,7 +1294,7 @@ D 2026-11-30 廿二:lunarDay badge=- mark=0
 U 2026-11 default: 立冬(solarTerm,+6,11月7日 | 九月廿九 | 周六) 小雪(solarTerm,+21,11月22日 | 十月十四 | 周日) 感恩节(festival,+25,11月26日 | 十月十八 | 周四) 大雪(solarTerm,+36,12月7日 | 十月廿九 | 周一) 冬至(solarTerm,+51,12月22日 | 冬月十四 | 周二) 平安夜(festival,+53,12月24日 | 冬月十六 | 周四) 圣诞节(festival,+54,12月25日 | 冬月十七 | 周五) 元旦(festival,+61,1月1日 | 冬月廿四 | 周五) 小寒(solarTerm,+65,1月5日 | 冬月廿八 | 周二) 腊八节(festival,+75,1月15日 | 腊月初八 | 周五) 大寒(solarTerm,+80,1月20日 | 腊月十三 | 周三) 小年(festival,+90,1月30日 | 腊月廿三 | 周六)
 U 2026-11 noTerms: 感恩节(festival,+25,11月26日 | 十月十八 | 周四) 平安夜(festival,+53,12月24日 | 冬月十六 | 周四) 圣诞节(festival,+54,12月25日 | 冬月十七 | 周五) 元旦(festival,+61,1月1日 | 冬月廿四 | 周五) 腊八节(festival,+75,1月15日 | 腊月初八 | 周五) 小年(festival,+90,1月30日 | 腊月廿三 | 周六)
 U 2026-11 noWestern: 立冬(solarTerm,+6,11月7日 | 九月廿九 | 周六) 小雪(solarTerm,+21,11月22日 | 十月十四 | 周日) 大雪(solarTerm,+36,12月7日 | 十月廿九 | 周一) 冬至(solarTerm,+51,12月22日 | 冬月十四 | 周二) 元旦(festival,+61,1月1日 | 冬月廿四 | 周五) 小寒(solarTerm,+65,1月5日 | 冬月廿八 | 周二) 腊八节(festival,+75,1月15日 | 腊月初八 | 周五) 大寒(solarTerm,+80,1月20日 | 腊月十三 | 周三) 小年(festival,+90,1月30日 | 腊月廿三 | 周六)
-R 2026-11: -
+R 2026-11: 元旦 61天后
 D 2026-12-01 廿三:lunarDay badge=- mark=0
 D 2026-12-02 廿四:lunarDay badge=- mark=0
 D 2026-12-03 廿五:lunarDay badge=- mark=0
@@ -1333,10 +1333,10 @@ D 2026-12-31 廿三:lunarDay badge=- mark=0
 U 2026-12 default: 大雪(solarTerm,+6,12月7日 | 十月廿九 | 周一) 冬至(solarTerm,+21,12月22日 | 冬月十四 | 周二) 平安夜(festival,+23,12月24日 | 冬月十六 | 周四) 圣诞节(festival,+24,12月25日 | 冬月十七 | 周五) 元旦(festival,+31,1月1日 | 冬月廿四 | 周五) 小寒(solarTerm,+35,1月5日 | 冬月廿八 | 周二) 腊八节(festival,+45,1月15日 | 腊月初八 | 周五) 大寒(solarTerm,+50,1月20日 | 腊月十三 | 周三) 小年(festival,+60,1月30日 | 腊月廿三 | 周六) 立春(solarTerm,+65,2月4日 | 腊月廿八 | 周四) 除夕(festival,+66,2月5日 | 腊月廿九 | 周五) 春节(festival,+67,2月6日 | 正月初一 | 周六) 情人节(festival,+75,2月14日 | 正月初九 | 周日) 雨水(solarTerm,+80,2月19日 | 正月十四 | 周五) 元宵节(festival,+81,2月20日 | 正月十五 | 周六)
 U 2026-12 noTerms: 平安夜(festival,+23,12月24日 | 冬月十六 | 周四) 圣诞节(festival,+24,12月25日 | 冬月十七 | 周五) 元旦(festival,+31,1月1日 | 冬月廿四 | 周五) 腊八节(festival,+45,1月15日 | 腊月初八 | 周五) 小年(festival,+60,1月30日 | 腊月廿三 | 周六) 除夕(festival,+66,2月5日 | 腊月廿九 | 周五) 春节(festival,+67,2月6日 | 正月初一 | 周六) 情人节(festival,+75,2月14日 | 正月初九 | 周日) 元宵节(festival,+81,2月20日 | 正月十五 | 周六)
 U 2026-12 noWestern: 大雪(solarTerm,+6,12月7日 | 十月廿九 | 周一) 冬至(solarTerm,+21,12月22日 | 冬月十四 | 周二) 元旦(festival,+31,1月1日 | 冬月廿四 | 周五) 小寒(solarTerm,+35,1月5日 | 冬月廿八 | 周二) 腊八节(festival,+45,1月15日 | 腊月初八 | 周五) 大寒(solarTerm,+50,1月20日 | 腊月十三 | 周三) 小年(festival,+60,1月30日 | 腊月廿三 | 周六) 立春(solarTerm,+65,2月4日 | 腊月廿八 | 周四) 除夕(festival,+66,2月5日 | 腊月廿九 | 周五) 春节(festival,+67,2月6日 | 正月初一 | 周六) 雨水(solarTerm,+80,2月19日 | 正月十四 | 周五) 元宵节(festival,+81,2月20日 | 正月十五 | 周六)
-R 2026-12: -
-D 2027-01-01 元旦:festival badge=- mark=1
-D 2027-01-02 廿五:lunarDay badge=- mark=0
-D 2027-01-03 廿六:lunarDay badge=- mark=0
+R 2026-12: 元旦 31天后
+D 2027-01-01 元旦:festival badge=休 mark=1
+D 2027-01-02 廿五:lunarDay badge=休 mark=1
+D 2027-01-03 廿六:lunarDay badge=休 mark=1
 D 2027-01-04 廿七:lunarDay badge=- mark=0
 D 2027-01-05 小寒:solarTerm badge=- mark=1
   noTerms 2027-01-05 廿八:lunarDay badge=- mark=0
@@ -1366,27 +1366,27 @@ D 2027-01-27 二十:lunarDay badge=- mark=0
 D 2027-01-28 廿一:lunarDay badge=- mark=0
 D 2027-01-29 廿二:lunarDay badge=- mark=0
 D 2027-01-30 小年:festival badge=- mark=1
-D 2027-01-31 廿四:lunarDay badge=- mark=0
+D 2027-01-31 廿四:lunarDay badge=班 mark=1
 U 2027-1 default: 元旦(festival,+0,1月1日 | 冬月廿四 | 周五) 小寒(solarTerm,+4,1月5日 | 冬月廿八 | 周二) 腊八节(festival,+14,1月15日 | 腊月初八 | 周五) 大寒(solarTerm,+19,1月20日 | 腊月十三 | 周三) 小年(festival,+29,1月30日 | 腊月廿三 | 周六) 立春(solarTerm,+34,2月4日 | 腊月廿八 | 周四) 除夕(festival,+35,2月5日 | 腊月廿九 | 周五) 春节(festival,+36,2月6日 | 正月初一 | 周六) 情人节(festival,+44,2月14日 | 正月初九 | 周日) 雨水(solarTerm,+49,2月19日 | 正月十四 | 周五) 元宵节(festival,+50,2月20日 | 正月十五 | 周六) 惊蛰(solarTerm,+64,3月6日 | 正月廿九 | 周六) 妇女节(festival,+66,3月8日 | 二月初一 | 周一) 龙抬头(festival,+67,3月9日 | 二月初二 | 周二) 植树节(festival,+70,3月12日 | 二月初五 | 周五) 春分(solarTerm,+79,3月21日 | 二月十四 | 周日) 愚人节(festival,+90,4月1日 | 二月廿五 | 周四)
 U 2027-1 noTerms: 元旦(festival,+0,1月1日 | 冬月廿四 | 周五) 腊八节(festival,+14,1月15日 | 腊月初八 | 周五) 小年(festival,+29,1月30日 | 腊月廿三 | 周六) 除夕(festival,+35,2月5日 | 腊月廿九 | 周五) 春节(festival,+36,2月6日 | 正月初一 | 周六) 情人节(festival,+44,2月14日 | 正月初九 | 周日) 元宵节(festival,+50,2月20日 | 正月十五 | 周六) 妇女节(festival,+66,3月8日 | 二月初一 | 周一) 龙抬头(festival,+67,3月9日 | 二月初二 | 周二) 植树节(festival,+70,3月12日 | 二月初五 | 周五) 愚人节(festival,+90,4月1日 | 二月廿五 | 周四)
 U 2027-1 noWestern: 元旦(festival,+0,1月1日 | 冬月廿四 | 周五) 小寒(solarTerm,+4,1月5日 | 冬月廿八 | 周二) 腊八节(festival,+14,1月15日 | 腊月初八 | 周五) 大寒(solarTerm,+19,1月20日 | 腊月十三 | 周三) 小年(festival,+29,1月30日 | 腊月廿三 | 周六) 立春(solarTerm,+34,2月4日 | 腊月廿八 | 周四) 除夕(festival,+35,2月5日 | 腊月廿九 | 周五) 春节(festival,+36,2月6日 | 正月初一 | 周六) 雨水(solarTerm,+49,2月19日 | 正月十四 | 周五) 元宵节(festival,+50,2月20日 | 正月十五 | 周六) 惊蛰(solarTerm,+64,3月6日 | 正月廿九 | 周六) 妇女节(festival,+66,3月8日 | 二月初一 | 周一) 龙抬头(festival,+67,3月9日 | 二月初二 | 周二) 植树节(festival,+70,3月12日 | 二月初五 | 周五) 春分(solarTerm,+79,3月21日 | 二月十四 | 周日)
-R 2027-1: -
+R 2027-1: 春节 35天后
 D 2027-02-01 廿五:lunarDay badge=- mark=0
 D 2027-02-02 廿六:lunarDay badge=- mark=0
 D 2027-02-03 廿七:lunarDay badge=- mark=0
 D 2027-02-04 立春:solarTerm badge=- mark=1
   noTerms 2027-02-04 廿八:lunarDay badge=- mark=0
-D 2027-02-05 除夕:festival badge=- mark=1
-D 2027-02-06 春节:festival badge=- mark=1
-D 2027-02-07 初二:lunarDay badge=- mark=0
-D 2027-02-08 初三:lunarDay badge=- mark=0
-D 2027-02-09 初四:lunarDay badge=- mark=0
-D 2027-02-10 初五:lunarDay badge=- mark=0
-D 2027-02-11 初六:lunarDay badge=- mark=0
-D 2027-02-12 初七:lunarDay badge=- mark=0
-D 2027-02-13 初八:lunarDay badge=- mark=0
-D 2027-02-14 情人节:festival badge=- mark=1
-  noWestern 2027-02-14 初九:lunarDay badge=- mark=0
+D 2027-02-05 除夕:festival,春节:festival badge=休 mark=1
+D 2027-02-06 春节:festival badge=休 mark=1
+D 2027-02-07 初二:lunarDay badge=休 mark=1
+D 2027-02-08 初三:lunarDay badge=休 mark=1
+D 2027-02-09 初四:lunarDay badge=休 mark=1
+D 2027-02-10 初五:lunarDay badge=休 mark=1
+D 2027-02-11 初六:lunarDay badge=休 mark=1
+D 2027-02-12 初七:lunarDay badge=休 mark=1
+D 2027-02-13 初八:lunarDay badge=休 mark=1
+D 2027-02-14 情人节:festival badge=班 mark=1
+  noWestern 2027-02-14 初九:lunarDay badge=班 mark=1
 D 2027-02-15 初十:lunarDay badge=- mark=0
 D 2027-02-16 十一:lunarDay badge=- mark=0
 D 2027-02-17 十二:lunarDay badge=- mark=0
@@ -1405,7 +1405,7 @@ D 2027-02-28 廿三:lunarDay badge=- mark=0
 U 2027-2 default: 立春(solarTerm,+3,2月4日 | 腊月廿八 | 周四) 除夕(festival,+4,2月5日 | 腊月廿九 | 周五) 春节(festival,+5,2月6日 | 正月初一 | 周六) 情人节(festival,+13,2月14日 | 正月初九 | 周日) 雨水(solarTerm,+18,2月19日 | 正月十四 | 周五) 元宵节(festival,+19,2月20日 | 正月十五 | 周六) 惊蛰(solarTerm,+33,3月6日 | 正月廿九 | 周六) 妇女节(festival,+35,3月8日 | 二月初一 | 周一) 龙抬头(festival,+36,3月9日 | 二月初二 | 周二) 植树节(festival,+39,3月12日 | 二月初五 | 周五) 春分(solarTerm,+48,3月21日 | 二月十四 | 周日) 愚人节(festival,+59,4月1日 | 二月廿五 | 周四) 清明(solarTerm,+63,4月5日 | 二月廿九 | 周一) 上巳节(festival,+67,4月9日 | 三月初三 | 周五) 谷雨(solarTerm,+78,4月20日 | 三月十四 | 周二) 劳动节(festival,+89,5月1日 | 三月廿五 | 周六)
 U 2027-2 noTerms: 除夕(festival,+4,2月5日 | 腊月廿九 | 周五) 春节(festival,+5,2月6日 | 正月初一 | 周六) 情人节(festival,+13,2月14日 | 正月初九 | 周日) 元宵节(festival,+19,2月20日 | 正月十五 | 周六) 妇女节(festival,+35,3月8日 | 二月初一 | 周一) 龙抬头(festival,+36,3月9日 | 二月初二 | 周二) 植树节(festival,+39,3月12日 | 二月初五 | 周五) 愚人节(festival,+59,4月1日 | 二月廿五 | 周四) 上巳节(festival,+67,4月9日 | 三月初三 | 周五) 劳动节(festival,+89,5月1日 | 三月廿五 | 周六)
 U 2027-2 noWestern: 立春(solarTerm,+3,2月4日 | 腊月廿八 | 周四) 除夕(festival,+4,2月5日 | 腊月廿九 | 周五) 春节(festival,+5,2月6日 | 正月初一 | 周六) 雨水(solarTerm,+18,2月19日 | 正月十四 | 周五) 元宵节(festival,+19,2月20日 | 正月十五 | 周六) 惊蛰(solarTerm,+33,3月6日 | 正月廿九 | 周六) 妇女节(festival,+35,3月8日 | 二月初一 | 周一) 龙抬头(festival,+36,3月9日 | 二月初二 | 周二) 植树节(festival,+39,3月12日 | 二月初五 | 周五) 春分(solarTerm,+48,3月21日 | 二月十四 | 周日) 清明(solarTerm,+63,4月5日 | 二月廿九 | 周一) 上巳节(festival,+67,4月9日 | 三月初三 | 周五) 谷雨(solarTerm,+78,4月20日 | 三月十四 | 周二) 劳动节(festival,+89,5月1日 | 三月廿五 | 周六)
-R 2027-2: -
+R 2027-2: 春节 4天后
 D 2027-03-01 廿四:lunarDay badge=- mark=0
 D 2027-03-02 廿五:lunarDay badge=- mark=0
 D 2027-03-03 廿六:lunarDay badge=- mark=0
@@ -1442,14 +1442,14 @@ D 2027-03-31 廿四:lunarDay badge=- mark=0
 U 2027-3 default: 惊蛰(solarTerm,+5,3月6日 | 正月廿九 | 周六) 妇女节(festival,+7,3月8日 | 二月初一 | 周一) 龙抬头(festival,+8,3月9日 | 二月初二 | 周二) 植树节(festival,+11,3月12日 | 二月初五 | 周五) 春分(solarTerm,+20,3月21日 | 二月十四 | 周日) 愚人节(festival,+31,4月1日 | 二月廿五 | 周四) 清明(solarTerm,+35,4月5日 | 二月廿九 | 周一) 上巳节(festival,+39,4月9日 | 三月初三 | 周五) 谷雨(solarTerm,+50,4月20日 | 三月十四 | 周二) 劳动节(festival,+61,5月1日 | 三月廿五 | 周六) 青年节(festival,+64,5月4日 | 三月廿八 | 周二) 立夏(solarTerm,+66,5月6日 | 四月初一 | 周四) 母亲节(festival,+69,5月9日 | 四月初四 | 周日) 小满(solarTerm,+81,5月21日 | 四月十六 | 周五)
 U 2027-3 noTerms: 妇女节(festival,+7,3月8日 | 二月初一 | 周一) 龙抬头(festival,+8,3月9日 | 二月初二 | 周二) 植树节(festival,+11,3月12日 | 二月初五 | 周五) 愚人节(festival,+31,4月1日 | 二月廿五 | 周四) 上巳节(festival,+39,4月9日 | 三月初三 | 周五) 劳动节(festival,+61,5月1日 | 三月廿五 | 周六) 青年节(festival,+64,5月4日 | 三月廿八 | 周二) 母亲节(festival,+69,5月9日 | 四月初四 | 周日)
 U 2027-3 noWestern: 惊蛰(solarTerm,+5,3月6日 | 正月廿九 | 周六) 妇女节(festival,+7,3月8日 | 二月初一 | 周一) 龙抬头(festival,+8,3月9日 | 二月初二 | 周二) 植树节(festival,+11,3月12日 | 二月初五 | 周五) 春分(solarTerm,+20,3月21日 | 二月十四 | 周日) 清明(solarTerm,+35,4月5日 | 二月廿九 | 周一) 上巳节(festival,+39,4月9日 | 三月初三 | 周五) 谷雨(solarTerm,+50,4月20日 | 三月十四 | 周二) 劳动节(festival,+61,5月1日 | 三月廿五 | 周六) 青年节(festival,+64,5月4日 | 三月廿八 | 周二) 立夏(solarTerm,+66,5月6日 | 四月初一 | 周四) 小满(solarTerm,+81,5月21日 | 四月十六 | 周五)
-R 2027-3: -
+R 2027-3: 清明节 33天后
 D 2027-04-01 愚人节:festival badge=- mark=1
   noWestern 2027-04-01 廿五:lunarDay badge=- mark=0
 D 2027-04-02 廿六:lunarDay badge=- mark=0
-D 2027-04-03 廿七:lunarDay badge=- mark=0
-D 2027-04-04 廿八:lunarDay badge=- mark=0
-D 2027-04-05 清明:solarTerm badge=- mark=1
-  noTerms 2027-04-05 廿九:lunarDay badge=- mark=0
+D 2027-04-03 清明节:festival badge=休 mark=1
+D 2027-04-04 廿八:lunarDay badge=休 mark=1
+D 2027-04-05 清明:solarTerm badge=休 mark=1
+  noTerms 2027-04-05 廿九:lunarDay badge=休 mark=1
 D 2027-04-06 三十:lunarDay badge=- mark=0
 D 2027-04-07 三月:lunarMonthStart badge=- mark=0
 D 2027-04-08 初二:lunarDay badge=- mark=0
@@ -1479,16 +1479,16 @@ D 2027-04-30 廿四:lunarDay badge=- mark=0
 U 2027-4 default: 愚人节(festival,+0,4月1日 | 二月廿五 | 周四) 清明(solarTerm,+4,4月5日 | 二月廿九 | 周一) 上巳节(festival,+8,4月9日 | 三月初三 | 周五) 谷雨(solarTerm,+19,4月20日 | 三月十四 | 周二) 劳动节(festival,+30,5月1日 | 三月廿五 | 周六) 青年节(festival,+33,5月4日 | 三月廿八 | 周二) 立夏(solarTerm,+35,5月6日 | 四月初一 | 周四) 母亲节(festival,+38,5月9日 | 四月初四 | 周日) 小满(solarTerm,+50,5月21日 | 四月十六 | 周五) 儿童节(festival,+61,6月1日 | 四月廿七 | 周二) 芒种(solarTerm,+66,6月6日 | 五月初二 | 周日) 端午节(festival,+69,6月9日 | 五月初五 | 周三) 父亲节(festival,+80,6月20日 | 五月十六 | 周日) 夏至(solarTerm,+81,6月21日 | 五月十七 | 周一)
 U 2027-4 noTerms: 愚人节(festival,+0,4月1日 | 二月廿五 | 周四) 上巳节(festival,+8,4月9日 | 三月初三 | 周五) 劳动节(festival,+30,5月1日 | 三月廿五 | 周六) 青年节(festival,+33,5月4日 | 三月廿八 | 周二) 母亲节(festival,+38,5月9日 | 四月初四 | 周日) 儿童节(festival,+61,6月1日 | 四月廿七 | 周二) 端午节(festival,+69,6月9日 | 五月初五 | 周三) 父亲节(festival,+80,6月20日 | 五月十六 | 周日)
 U 2027-4 noWestern: 清明(solarTerm,+4,4月5日 | 二月廿九 | 周一) 上巳节(festival,+8,4月9日 | 三月初三 | 周五) 谷雨(solarTerm,+19,4月20日 | 三月十四 | 周二) 劳动节(festival,+30,5月1日 | 三月廿五 | 周六) 青年节(festival,+33,5月4日 | 三月廿八 | 周二) 立夏(solarTerm,+35,5月6日 | 四月初一 | 周四) 小满(solarTerm,+50,5月21日 | 四月十六 | 周五) 儿童节(festival,+61,6月1日 | 四月廿七 | 周二) 芒种(solarTerm,+66,6月6日 | 五月初二 | 周日) 端午节(festival,+69,6月9日 | 五月初五 | 周三) 夏至(solarTerm,+81,6月21日 | 五月十七 | 周一)
-R 2027-4: -
-D 2027-05-01 劳动节:festival badge=- mark=1
-D 2027-05-02 廿六:lunarDay badge=- mark=0
-D 2027-05-03 廿七:lunarDay badge=- mark=0
-D 2027-05-04 青年节:festival badge=- mark=1
-D 2027-05-05 廿九:lunarDay badge=- mark=0
+R 2027-4: 清明节 2天后
+D 2027-05-01 劳动节:festival badge=休 mark=1
+D 2027-05-02 廿六:lunarDay badge=休 mark=1
+D 2027-05-03 廿七:lunarDay badge=休 mark=1
+D 2027-05-04 青年节:festival badge=休 mark=1
+D 2027-05-05 廿九:lunarDay badge=休 mark=1
 D 2027-05-06 立夏:solarTerm badge=- mark=1
   noTerms 2027-05-06 四月:lunarMonthStart badge=- mark=0
 D 2027-05-07 初二:lunarDay badge=- mark=0
-D 2027-05-08 初三:lunarDay badge=- mark=0
+D 2027-05-08 初三:lunarDay badge=班 mark=1
 D 2027-05-09 母亲节:festival badge=- mark=1
   noWestern 2027-05-09 初四:lunarDay badge=- mark=0
 D 2027-05-10 初五:lunarDay badge=- mark=0
@@ -1517,7 +1517,7 @@ D 2027-05-31 廿六:lunarDay badge=- mark=0
 U 2027-5 default: 劳动节(festival,+0,5月1日 | 三月廿五 | 周六) 青年节(festival,+3,5月4日 | 三月廿八 | 周二) 立夏(solarTerm,+5,5月6日 | 四月初一 | 周四) 母亲节(festival,+8,5月9日 | 四月初四 | 周日) 小满(solarTerm,+20,5月21日 | 四月十六 | 周五) 儿童节(festival,+31,6月1日 | 四月廿七 | 周二) 芒种(solarTerm,+36,6月6日 | 五月初二 | 周日) 端午节(festival,+39,6月9日 | 五月初五 | 周三) 父亲节(festival,+50,6月20日 | 五月十六 | 周日) 夏至(solarTerm,+51,6月21日 | 五月十七 | 周一) 建党节(festival,+61,7月1日 | 五月廿七 | 周四) 小暑(solarTerm,+67,7月7日 | 六月初四 | 周三) 大暑(solarTerm,+83,7月23日 | 六月二十 | 周五)
 U 2027-5 noTerms: 劳动节(festival,+0,5月1日 | 三月廿五 | 周六) 青年节(festival,+3,5月4日 | 三月廿八 | 周二) 母亲节(festival,+8,5月9日 | 四月初四 | 周日) 儿童节(festival,+31,6月1日 | 四月廿七 | 周二) 端午节(festival,+39,6月9日 | 五月初五 | 周三) 父亲节(festival,+50,6月20日 | 五月十六 | 周日) 建党节(festival,+61,7月1日 | 五月廿七 | 周四)
 U 2027-5 noWestern: 劳动节(festival,+0,5月1日 | 三月廿五 | 周六) 青年节(festival,+3,5月4日 | 三月廿八 | 周二) 立夏(solarTerm,+5,5月6日 | 四月初一 | 周四) 小满(solarTerm,+20,5月21日 | 四月十六 | 周五) 儿童节(festival,+31,6月1日 | 四月廿七 | 周二) 芒种(solarTerm,+36,6月6日 | 五月初二 | 周日) 端午节(festival,+39,6月9日 | 五月初五 | 周三) 夏至(solarTerm,+51,6月21日 | 五月十七 | 周一) 建党节(festival,+61,7月1日 | 五月廿七 | 周四) 小暑(solarTerm,+67,7月7日 | 六月初四 | 周三) 大暑(solarTerm,+83,7月23日 | 六月二十 | 周五)
-R 2027-5: -
+R 2027-5: 端午节 39天后
 D 2027-06-01 儿童节:festival badge=- mark=1
 D 2027-06-02 廿八:lunarDay badge=- mark=0
 D 2027-06-03 廿九:lunarDay badge=- mark=0
@@ -1527,7 +1527,7 @@ D 2027-06-06 芒种:solarTerm badge=- mark=1
   noTerms 2027-06-06 初二:lunarDay badge=- mark=0
 D 2027-06-07 初三:lunarDay badge=- mark=0
 D 2027-06-08 初四:lunarDay badge=- mark=0
-D 2027-06-09 端午节:festival badge=- mark=1
+D 2027-06-09 端午节:festival badge=休 mark=1
 D 2027-06-10 初六:lunarDay badge=- mark=0
 D 2027-06-11 初七:lunarDay badge=- mark=0
 D 2027-06-12 初八:lunarDay badge=- mark=0
@@ -1554,7 +1554,7 @@ D 2027-06-30 廿六:lunarDay badge=- mark=0
 U 2027-6 default: 儿童节(festival,+0,6月1日 | 四月廿七 | 周二) 芒种(solarTerm,+5,6月6日 | 五月初二 | 周日) 端午节(festival,+8,6月9日 | 五月初五 | 周三) 父亲节(festival,+19,6月20日 | 五月十六 | 周日) 夏至(solarTerm,+20,6月21日 | 五月十七 | 周一) 建党节(festival,+30,7月1日 | 五月廿七 | 周四) 小暑(solarTerm,+36,7月7日 | 六月初四 | 周三) 大暑(solarTerm,+52,7月23日 | 六月二十 | 周五) 建军节(festival,+61,8月1日 | 六月廿九 | 周日) 七夕节(festival,+68,8月8日 | 七月初七 | 周日) 立秋(solarTerm,+68,8月8日 | 七月初七 | 周日) 中元节(festival,+76,8月16日 | 七月十五 | 周一) 处暑(solarTerm,+83,8月23日 | 七月廿二 | 周一)
 U 2027-6 noTerms: 儿童节(festival,+0,6月1日 | 四月廿七 | 周二) 端午节(festival,+8,6月9日 | 五月初五 | 周三) 父亲节(festival,+19,6月20日 | 五月十六 | 周日) 建党节(festival,+30,7月1日 | 五月廿七 | 周四) 建军节(festival,+61,8月1日 | 六月廿九 | 周日) 七夕节(festival,+68,8月8日 | 七月初七 | 周日) 中元节(festival,+76,8月16日 | 七月十五 | 周一)
 U 2027-6 noWestern: 儿童节(festival,+0,6月1日 | 四月廿七 | 周二) 芒种(solarTerm,+5,6月6日 | 五月初二 | 周日) 端午节(festival,+8,6月9日 | 五月初五 | 周三) 夏至(solarTerm,+20,6月21日 | 五月十七 | 周一) 建党节(festival,+30,7月1日 | 五月廿七 | 周四) 小暑(solarTerm,+36,7月7日 | 六月初四 | 周三) 大暑(solarTerm,+52,7月23日 | 六月二十 | 周五) 建军节(festival,+61,8月1日 | 六月廿九 | 周日) 七夕节(festival,+68,8月8日 | 七月初七 | 周日) 立秋(solarTerm,+68,8月8日 | 七月初七 | 周日) 中元节(festival,+76,8月16日 | 七月十五 | 周一) 处暑(solarTerm,+83,8月23日 | 七月廿二 | 周一)
-R 2027-6: -
+R 2027-6: 端午节 8天后
 D 2027-07-01 建党节:festival badge=- mark=1
 D 2027-07-02 廿八:lunarDay badge=- mark=0
 D 2027-07-03 廿九:lunarDay badge=- mark=0
@@ -1591,7 +1591,7 @@ D 2027-07-31 廿八:lunarDay badge=- mark=0
 U 2027-7 default: 建党节(festival,+0,7月1日 | 五月廿七 | 周四) 小暑(solarTerm,+6,7月7日 | 六月初四 | 周三) 大暑(solarTerm,+22,7月23日 | 六月二十 | 周五) 建军节(festival,+31,8月1日 | 六月廿九 | 周日) 七夕节(festival,+38,8月8日 | 七月初七 | 周日) 立秋(solarTerm,+38,8月8日 | 七月初七 | 周日) 中元节(festival,+46,8月16日 | 七月十五 | 周一) 处暑(solarTerm,+53,8月23日 | 七月廿二 | 周一) 白露(solarTerm,+69,9月8日 | 八月初八 | 周三) 教师节(festival,+71,9月10日 | 八月初十 | 周五) 中秋节(festival,+76,9月15日 | 八月十五 | 周三) 秋分(solarTerm,+84,9月23日 | 八月廿三 | 周四)
 U 2027-7 noTerms: 建党节(festival,+0,7月1日 | 五月廿七 | 周四) 建军节(festival,+31,8月1日 | 六月廿九 | 周日) 七夕节(festival,+38,8月8日 | 七月初七 | 周日) 中元节(festival,+46,8月16日 | 七月十五 | 周一) 教师节(festival,+71,9月10日 | 八月初十 | 周五) 中秋节(festival,+76,9月15日 | 八月十五 | 周三)
 U 2027-7 noWestern: 建党节(festival,+0,7月1日 | 五月廿七 | 周四) 小暑(solarTerm,+6,7月7日 | 六月初四 | 周三) 大暑(solarTerm,+22,7月23日 | 六月二十 | 周五) 建军节(festival,+31,8月1日 | 六月廿九 | 周日) 七夕节(festival,+38,8月8日 | 七月初七 | 周日) 立秋(solarTerm,+38,8月8日 | 七月初七 | 周日) 中元节(festival,+46,8月16日 | 七月十五 | 周一) 处暑(solarTerm,+53,8月23日 | 七月廿二 | 周一) 白露(solarTerm,+69,9月8日 | 八月初八 | 周三) 教师节(festival,+71,9月10日 | 八月初十 | 周五) 中秋节(festival,+76,9月15日 | 八月十五 | 周三) 秋分(solarTerm,+84,9月23日 | 八月廿三 | 周四)
-R 2027-7: -
+R 2027-7: 中秋节 76天后
 D 2027-08-01 建军节:festival badge=- mark=1
 D 2027-08-02 七月:lunarMonthStart badge=- mark=0
 D 2027-08-03 初二:lunarDay badge=- mark=0
@@ -1628,7 +1628,7 @@ D 2027-08-31 三十:lunarDay badge=- mark=0
 U 2027-8 default: 建军节(festival,+0,8月1日 | 六月廿九 | 周日) 七夕节(festival,+7,8月8日 | 七月初七 | 周日) 立秋(solarTerm,+7,8月8日 | 七月初七 | 周日) 中元节(festival,+15,8月16日 | 七月十五 | 周一) 处暑(solarTerm,+22,8月23日 | 七月廿二 | 周一) 白露(solarTerm,+38,9月8日 | 八月初八 | 周三) 教师节(festival,+40,9月10日 | 八月初十 | 周五) 中秋节(festival,+45,9月15日 | 八月十五 | 周三) 秋分(solarTerm,+53,9月23日 | 八月廿三 | 周四) 国庆节(festival,+61,10月1日 | 九月初二 | 周五) 重阳节(festival,+68,10月8日 | 九月初九 | 周五) 寒露(solarTerm,+68,10月8日 | 九月初九 | 周五) 霜降(solarTerm,+83,10月23日 | 九月廿四 | 周六)
 U 2027-8 noTerms: 建军节(festival,+0,8月1日 | 六月廿九 | 周日) 七夕节(festival,+7,8月8日 | 七月初七 | 周日) 中元节(festival,+15,8月16日 | 七月十五 | 周一) 教师节(festival,+40,9月10日 | 八月初十 | 周五) 中秋节(festival,+45,9月15日 | 八月十五 | 周三) 国庆节(festival,+61,10月1日 | 九月初二 | 周五) 重阳节(festival,+68,10月8日 | 九月初九 | 周五)
 U 2027-8 noWestern: 建军节(festival,+0,8月1日 | 六月廿九 | 周日) 七夕节(festival,+7,8月8日 | 七月初七 | 周日) 立秋(solarTerm,+7,8月8日 | 七月初七 | 周日) 中元节(festival,+15,8月16日 | 七月十五 | 周一) 处暑(solarTerm,+22,8月23日 | 七月廿二 | 周一) 白露(solarTerm,+38,9月8日 | 八月初八 | 周三) 教师节(festival,+40,9月10日 | 八月初十 | 周五) 中秋节(festival,+45,9月15日 | 八月十五 | 周三) 秋分(solarTerm,+53,9月23日 | 八月廿三 | 周四) 国庆节(festival,+61,10月1日 | 九月初二 | 周五) 重阳节(festival,+68,10月8日 | 九月初九 | 周五) 寒露(solarTerm,+68,10月8日 | 九月初九 | 周五) 霜降(solarTerm,+83,10月23日 | 九月廿四 | 周六)
-R 2027-8: -
+R 2027-8: 中秋节 45天后
 D 2027-09-01 八月:lunarMonthStart badge=- mark=0
 D 2027-09-02 初二:lunarDay badge=- mark=0
 D 2027-09-03 初三:lunarDay badge=- mark=0
@@ -1644,7 +1644,7 @@ D 2027-09-11 十一:lunarDay badge=- mark=0
 D 2027-09-12 十二:lunarDay badge=- mark=0
 D 2027-09-13 十三:lunarDay badge=- mark=0
 D 2027-09-14 十四:lunarDay badge=- mark=0
-D 2027-09-15 中秋节:festival badge=- mark=1
+D 2027-09-15 中秋节:festival badge=休 mark=1
 D 2027-09-16 十六:lunarDay badge=- mark=0
 D 2027-09-17 十七:lunarDay badge=- mark=0
 D 2027-09-18 十八:lunarDay badge=- mark=0
@@ -1656,7 +1656,7 @@ D 2027-09-23 秋分:solarTerm badge=- mark=1
   noTerms 2027-09-23 廿三:lunarDay badge=- mark=0
 D 2027-09-24 廿四:lunarDay badge=- mark=0
 D 2027-09-25 廿五:lunarDay badge=- mark=0
-D 2027-09-26 廿六:lunarDay badge=- mark=0
+D 2027-09-26 廿六:lunarDay badge=班 mark=1
 D 2027-09-27 廿七:lunarDay badge=- mark=0
 D 2027-09-28 廿八:lunarDay badge=- mark=0
 D 2027-09-29 廿九:lunarDay badge=- mark=0
@@ -1664,17 +1664,17 @@ D 2027-09-30 九月:lunarMonthStart badge=- mark=0
 U 2027-9 default: 白露(solarTerm,+7,9月8日 | 八月初八 | 周三) 教师节(festival,+9,9月10日 | 八月初十 | 周五) 中秋节(festival,+14,9月15日 | 八月十五 | 周三) 秋分(solarTerm,+22,9月23日 | 八月廿三 | 周四) 国庆节(festival,+30,10月1日 | 九月初二 | 周五) 重阳节(festival,+37,10月8日 | 九月初九 | 周五) 寒露(solarTerm,+37,10月8日 | 九月初九 | 周五) 霜降(solarTerm,+52,10月23日 | 九月廿四 | 周六) 万圣节(festival,+60,10月31日 | 十月初三 | 周日) 立冬(solarTerm,+67,11月7日 | 十月初十 | 周日) 小雪(solarTerm,+82,11月22日 | 十月廿五 | 周一) 感恩节(festival,+85,11月25日 | 十月廿八 | 周四)
 U 2027-9 noTerms: 教师节(festival,+9,9月10日 | 八月初十 | 周五) 中秋节(festival,+14,9月15日 | 八月十五 | 周三) 国庆节(festival,+30,10月1日 | 九月初二 | 周五) 重阳节(festival,+37,10月8日 | 九月初九 | 周五) 万圣节(festival,+60,10月31日 | 十月初三 | 周日) 感恩节(festival,+85,11月25日 | 十月廿八 | 周四)
 U 2027-9 noWestern: 白露(solarTerm,+7,9月8日 | 八月初八 | 周三) 教师节(festival,+9,9月10日 | 八月初十 | 周五) 中秋节(festival,+14,9月15日 | 八月十五 | 周三) 秋分(solarTerm,+22,9月23日 | 八月廿三 | 周四) 国庆节(festival,+30,10月1日 | 九月初二 | 周五) 重阳节(festival,+37,10月8日 | 九月初九 | 周五) 寒露(solarTerm,+37,10月8日 | 九月初九 | 周五) 霜降(solarTerm,+52,10月23日 | 九月廿四 | 周六) 立冬(solarTerm,+67,11月7日 | 十月初十 | 周日) 小雪(solarTerm,+82,11月22日 | 十月廿五 | 周一)
-R 2027-9: -
-D 2027-10-01 国庆节:festival badge=- mark=1
-D 2027-10-02 初三:lunarDay badge=- mark=0
-D 2027-10-03 初四:lunarDay badge=- mark=0
-D 2027-10-04 初五:lunarDay badge=- mark=0
-D 2027-10-05 初六:lunarDay badge=- mark=0
-D 2027-10-06 初七:lunarDay badge=- mark=0
-D 2027-10-07 初八:lunarDay badge=- mark=0
+R 2027-9: 中秋节 14天后
+D 2027-10-01 国庆节:festival badge=休 mark=1
+D 2027-10-02 初三:lunarDay badge=休 mark=1
+D 2027-10-03 初四:lunarDay badge=休 mark=1
+D 2027-10-04 初五:lunarDay badge=休 mark=1
+D 2027-10-05 初六:lunarDay badge=休 mark=1
+D 2027-10-06 初七:lunarDay badge=休 mark=1
+D 2027-10-07 初八:lunarDay badge=休 mark=1
 D 2027-10-08 寒露:solarTerm,重阳节:festival badge=- mark=1
   noTerms 2027-10-08 重阳节:festival badge=- mark=1
-D 2027-10-09 初十:lunarDay badge=- mark=0
+D 2027-10-09 初十:lunarDay badge=班 mark=1
 D 2027-10-10 十一:lunarDay badge=- mark=0
 D 2027-10-11 十二:lunarDay badge=- mark=0
 D 2027-10-12 十三:lunarDay badge=- mark=0

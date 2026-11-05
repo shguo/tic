@@ -7,7 +7,7 @@
 
 核心已实现于 [`Tic/Sources/Holiday/HolidayStore.swift`](../Tic/Sources/Holiday/HolidayStore.swift)：
 
-- **内置数据**：[`Tic/Resources/holidays/{2024,2025,2026}.json`](../Tic/Resources/holidays/)（holiday-cn 格式），启动时加载，**完全离线**。
+- **内置数据**：[`Tic/Resources/holidays/{2024,2025,2026,2027}.json`](../Tic/Resources/holidays/)（holiday-cn 格式），启动时加载，**完全离线**。
 - **统一格式**：解析为 `DayAnnotation`（`subtitle` = 放假节日名 / 补班为 nil，`badge` = 休/班），`CalendarMonthBuilder` 通过 `HolidayStore.shared.annotation(forKey:)` 查询。
 - **线程安全**：`HolidayStore` 用 `NSLock` 保护内部表。
 - **发版更新**：新年份 / 修订国务院安排后，更新 bundle 内 JSON 并 bump 版本；用户通过「检查更新」安装新版。
