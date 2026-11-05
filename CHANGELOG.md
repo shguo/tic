@@ -5,6 +5,12 @@
 
 ## [Unreleased]
 
+## [1.3.11] - 2026-11-05
+
+### 定制版（shguo/tic）
+
+- 新增 2027 年法定节假日与调休安排（依据国务院办公厅 2026-11-05 发布的通知）：春节 2 月 5 日至 13 日连休 9 天，1 月 31 日、2 月 14 日上班；国庆 9 月 26 日、10 月 9 日上班等
+
 ## [1.3.10] - 2026-10-26
 
 ### 定制版（shguo/tic）
@@ -221,7 +227,8 @@
 - 登录时自动启动
 - macOS 应用图标
 
-[Unreleased]: https://github.com/shguo/tic/compare/v1.3.10...HEAD
+[Unreleased]: https://github.com/shguo/tic/compare/v1.3.11...HEAD
+[1.3.11]: https://github.com/shguo/tic/compare/v1.3.10...v1.3.11
 [1.3.10]: https://github.com/shguo/tic/compare/v1.3.9...v1.3.10
 [1.3.9]: https://github.com/shguo/tic/compare/v1.3.8...v1.3.9
 [1.3.8]: https://github.com/shguo/tic/compare/v1.3.7...v1.3.8
