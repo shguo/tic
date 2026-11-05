@@ -156,16 +156,21 @@ enum CalendarMonthBuilder {
         return (next.name, days)
     }
 
-    /// 放假数据中每段连休的首日（升序）。放假数据启动时加载后不再变化，只算一次；
+    /// 放假数据中每段连休的首日（升序）。按 `HolidayStore.revision` 缓存，数据联网更新后才重算；
     /// 弹窗展开时每 3 秒轮播都会重算头部，不能每次逐日扫描。
-    private static let restPeriodStarts: [(date: Date, name: String)] = HolidayStore.shared.restDayKeys
-        .compactMap { key -> (date: Date, name: String)? in
-            guard let date = BeijingCalendar.date(fromKey: key),
-                  let name = storedAnnotation(for: date)?.subtitle,
-                  isFirstAnnotatedHoliday(date, subtitle: name)
-            else { return nil }
-            return (date, name)
+    private static var restPeriodStarts: [(date: Date, name: String)] {
+        restPeriodCache.value(revision: HolidayStore.shared.revision) {
+            HolidayStore.shared.restDayKeys.compactMap { key -> (date: Date, name: String)? in
+                guard let date = BeijingCalendar.date(fromKey: key),
+                      let name = storedAnnotation(for: date)?.subtitle,
+                      isFirstAnnotatedHoliday(date, subtitle: name)
+                else { return nil }
+                return (date, name)
+            }
         }
+    }
+
+    private static let restPeriodCache = RevisionCache<[(date: Date, name: String)]>()
 
     static func nextRestDayCountdownLabel(from date: Date) -> String? {
         guard let next = nextRestDayCountdown(from: date) else { return nil }
@@ -250,5 +255,21 @@ enum CalendarMonthBuilder {
     /// 月历网格周一为首列：`weekday` 为 `Calendar` 标准（1=周日 … 7=周六）。
     private static func mondayBasedLeadingBlankCount(weekdayOfFirst: Int) -> Int {
         (weekdayOfFirst + 5) % 7
+    }
+}
+
+/// 按数据版本号缓存一个计算结果；版本变化时重算。线程安全。
+final class RevisionCache<Value>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var revision: Int?
+    private var cached: Value?
+
+    func value(revision: Int, compute: () -> Value) -> Value {
+        lock.lock(); defer { lock.unlock() }
+        if self.revision == revision, let cached { return cached }
+        let value = compute()
+        self.revision = revision
+        cached = value
+        return value
     }
 }

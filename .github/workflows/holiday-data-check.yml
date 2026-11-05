@@ -1,7 +1,7 @@
 name: Holiday Data Check
 
-# 离线优先：客户端不联网刷新调休数据，新年份随版本内置发版。
-# 此哨兵仅在「上游已发布次年数据、而仓库尚未内置」时开 Issue 提醒维护者，消除「忘记发版」风险。
+# 客户端从本仓库 custom 分支联网拉取调休数据，新年份只需提交 JSON。
+# 此哨兵仅在「上游已发布次年数据、而仓库尚未收录」时开 Issue 提醒维护者，消除「忘记更新」风险。
 
 on:
   schedule:
@@ -51,6 +51,6 @@ jobs:
             --title "$TITLE" \
             --body "上游 [holiday-cn]($URL) 已发布 **$NEXT 年** 放假安排，但仓库 \`Tic/Resources/holidays/\` 尚未内置。
 
-          请取数写入 \`Tic/Resources/holidays/$NEXT.json\`（holiday-cn 格式）并 bump 版本发版。
+          请取数写入 \`Tic/Resources/holidays/$NEXT.json\`（holiday-cn 格式），跑测试后推送到 \`custom\`；客户端 24 小时内自动联网拉取，无需发版。
 
-          > 离线优先：客户端不联网刷新，新年份依赖发版分发。本 Issue 由 \`holiday-data-check.yml\` 自动创建。"
+          > 本 Issue 由 \`holiday-data-check.yml\` 自动创建。"

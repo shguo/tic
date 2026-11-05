@@ -10,6 +10,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         AppSettings.migrateLegacyFormatIfNeeded()
         LaunchAtLoginManager.shared.applyPreferredStateOnLaunch()
         UpdateChecker.shared.beginAutomaticUpdateChecks()
+        HolidayRemoteUpdater.shared.start()
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(configurePopoverWindow(_:)),

@@ -409,6 +409,60 @@ final class TicTests: XCTestCase {
         XCTAssertTrue(HolidayStore.shared.isYearUncovered(2023))
     }
 
+    // MARK: - 联网调休数据校验与替换
+
+    private func holidayJSON(year: Int, days: [(String, String, Bool)]) -> Data {
+        let items = days.map { "{\"name\":\"\($0.0)\",\"date\":\"\($0.1)\",\"isOffDay\":\($0.2)}" }
+        return Data("{\"year\":\(year),\"days\":[\(items.joined(separator: ","))]}".utf8)
+    }
+
+    private func offDays(_ year: Int, count: Int) -> [(String, String, Bool)] {
+        (1...count).map { ("国庆节", "\(year)-10-\($0 < 10 ? "0" : "")\($0)", true) }
+    }
+
+    func testHolidayValidationRejectsBadData() {
+        XCTAssertNil(HolidayStore.validatedDays(Data("{}".utf8), year: 2028))
+        XCTAssertNil(HolidayStore.validatedDays(holidayJSON(year: 2028, days: []), year: 2028), "空数据（上游未发布）")
+        XCTAssertNil(HolidayStore.validatedDays(holidayJSON(year: 2028, days: offDays(2028, count: 8)), year: 2029), "年份不符")
+        XCTAssertNil(HolidayStore.validatedDays(holidayJSON(year: 2028, days: offDays(2028, count: 3)), year: 2028), "放假天数过少")
+        XCTAssertNil(
+            HolidayStore.validatedDays(holidayJSON(year: 2028, days: offDays(2028, count: 7) + [("元旦", "2028-02-30", true)]), year: 2028),
+            "非法日期"
+        )
+        XCTAssertNotNil(HolidayStore.validatedDays(holidayJSON(year: 2028, days: offDays(2028, count: 8)), year: 2028))
+    }
+
+    func testBundledHolidayFilesPassValidation() throws {
+        for year in 2024...2027 {
+            let url = try XCTUnwrap(Bundle.main.url(forResource: "\(year)", withExtension: "json"))
+            XCTAssertNotNil(HolidayStore.validatedDays(try Data(contentsOf: url), year: year), "\(year)")
+        }
+    }
+
+    func testHolidayStoreInstallReplacesYearAndBumpsRevision() {
+        let store = HolidayStore(loadCache: false)
+        let revision = store.revision
+        XCTAssertTrue(store.isYearUncovered(2028))
+        let data = holidayJSON(year: 2028, days: offDays(2028, count: 7) + [("国庆节", "2028-10-08", false)])
+        XCTAssertTrue(store.install(year: 2028, data: data))
+        XCTAssertFalse(store.install(year: 2028, data: data), "内容相同不重复生效")
+        XCTAssertEqual(store.revision, revision + 1)
+        XCTAssertEqual(store.maxCoveredYear, 2028)
+        XCTAssertEqual(store.annotation(forKey: "2028-10-01")?.badge, .rest)
+        XCTAssertEqual(store.annotation(forKey: "2028-10-08")?.badge, .work)
+
+        XCTAssertTrue(store.install(year: 2028, data: holidayJSON(year: 2028, days: offDays(2028, count: 8))))
+        XCTAssertEqual(store.annotation(forKey: "2028-10-08")?.badge, .rest, "整年替换，旧补班日不再保留")
+    }
+
+    func testHolidayRemoteURLsPointAtReleaseRepo() {
+        let urls = HolidayRemoteUpdater.urls(year: 2028).map(\.absoluteString)
+        XCTAssertEqual(urls, [
+            "https://raw.githubusercontent.com/shguo/tic/custom/Tic/Resources/holidays/2028.json",
+            "https://cdn.jsdelivr.net/gh/shguo/tic@custom/Tic/Resources/holidays/2028.json",
+        ])
+    }
+
     // MARK: - 日历弹窗选中态重置（Issue #2）
 
     func testCalendarPopoverSelectionTodayUsesStartOfDay() {

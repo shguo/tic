@@ -1,19 +1,28 @@
 # 节假日 / 调休数据源方案（多源冗余 + 统一格式）
 
 > 背景：节气、农历节日、公历固定节日都能本地算法计算（永久有效，见 `SolarTermSupport` / `FestivalCalendar`）。
-> **唯一无法算法化的是「法定放假 / 调休」**——它是国务院每年行政公布的政策，无规律可推。客户端**仅读取 App 内置 JSON**；维护者在国务院公布后从 [holiday-cn](https://github.com/NateScarlet/holiday-cn) 取数、写入 `Resources/holidays/` 并发版。
+> **唯一无法算法化的是「法定放假 / 调休」**——它是国务院每年行政公布的政策，无规律可推。客户端内置一份 JSON 兜底，并**联网从发布仓库拉取更新**，新年份 / 修订无需发版。
 
-## 实现状态（2026-06-12，已落地）
+## 实现状态（2026-11-05）
 
-核心已实现于 [`Tic/Sources/Holiday/HolidayStore.swift`](../Tic/Sources/Holiday/HolidayStore.swift)：
-
-- **内置数据**：[`Tic/Resources/holidays/{2024,2025,2026,2027}.json`](../Tic/Resources/holidays/)（holiday-cn 格式），启动时加载，**完全离线**。
-- **统一格式**：解析为 `DayAnnotation`（`subtitle` = 放假节日名 / 补班为 nil，`badge` = 休/班），`CalendarMonthBuilder` 通过 `HolidayStore.shared.annotation(forKey:)` 查询。
+- **内置数据**：[`Tic/Resources/holidays/{2024,2025,2026,2027}.json`](../Tic/Resources/holidays/)（holiday-cn 格式），首启 / 离线兜底。
+- **联网更新**：[`HolidayRemoteUpdater`](../Tic/Sources/Holiday/HolidayRemoteUpdater.swift) 启动 5 秒后、此后每 6 小时检查一次，距上次成功拉取满 24 小时才真正请求；拉取**东八区当年与次年**。
+  - 数据源：发布仓库 `shguo/tic` 的 `custom` 分支 `Tic/Resources/holidays/{year}.json`（与内置资源是同一份文件）。
+  - 节点：`raw.githubusercontent.com` → `cdn.jsdelivr.net/gh/shguo/tic@custom/...`，逐个尝试。
+  - 校验：年份一致、日期合法且在该年 ±1 年内、放假 7–45 天；不通过视为未发布 / 脏数据，忽略。
+  - 生效：内容与现有不同才写入 `~/Library/Application Support/Tic/holidays/{year}.json` 并整年替换，发 `.holidayDataDidUpdate` 让弹窗清缓存重算；倒计时按 `HolidayStore.revision` 失效。
+  - 优先级：联网缓存 > 内置。任何失败静默忽略。
+  - 单元测试宿主内不读缓存、不联网（`AppRuntime.isRunningTests`），快照结果只取决于内置数据。
 - **线程安全**：`HolidayStore` 用 `NSLock` 保护内部表。
-- **发版更新**：新年份 / 修订国务院安排后，更新 bundle 内 JSON 并 bump 版本；用户通过「检查更新」安装新版。
 - **农历节日已脱钩**：春节/元宵/端午等由 `FestivalCatalog` / `FestivalCalendar` 本地推算；节日倒计时不依赖调休 JSON。
 
-**与下文完整方案的差异**：下文描述的「联网多源拉取 + Application Support 缓存」方案**已不再实现**；仅保留设计参考。下文为历史设计，按需查阅。
+## 维护者：国务院公布新安排后
+
+1. 取数写入 `Tic/Resources/holidays/{year}.json`（holiday-cn 格式；holiday-cn 未更新时按国办通知原文手写，核对放假总天数）。
+2. 跑测试（快照会变，删 fixture 重新生成并检查 diff），提交并推送到 `custom`。
+3. 客户端 24 小时内自动拉到（jsDelivr 节点对分支有缓存，最长约 12 小时）。**无需发版**；下次发版时内置数据顺带更新。
+
+> 下文为早期「多源冗余」设计，现实现只用发布仓库单一来源 + 双节点，保留作参考。
 
 ## 设计原则
 

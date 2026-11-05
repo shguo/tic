@@ -50,7 +50,7 @@ final class CalendarSettingsViewController: SettingsPaneViewController {
     }
 
     override func makeFooter() -> NSView? {
-        makeSettingsFootnote("法定节假日 / 调休数据已内置至 \(HolidayStore.shared.maxCoveredYear) 年，新年份随版本更新。")
+        makeSettingsFootnote("法定节假日 / 调休数据已覆盖至 \(HolidayStore.shared.maxCoveredYear) 年，国务院公布新安排后自动联网更新。")
     }
 
     @objc private func dotsChanged() {
