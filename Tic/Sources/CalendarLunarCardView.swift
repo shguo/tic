@@ -106,7 +106,7 @@ private struct CalendarYiJiScrollRows: View {
     }
 
     private static let fadeWidth: CGFloat = 36
-    private static let space = "yiJiScroll"
+    nonisolated private static let space = "yiJiScroll"
 
     private func badge(_ label: String, tint: Color) -> some View {
         CalendarYiJiBadge(label: label, tint: tint.opacity(0.8), size: 11, weight: .medium)
