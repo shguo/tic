@@ -5,8 +5,6 @@ struct CalendarLunarCardView: View {
     let showsYiJi: Bool
     let palette: CalendarPalette
 
-    @State private var isYiJiDetailPresented = false
-
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 4) {
@@ -33,35 +31,19 @@ struct CalendarLunarCardView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(palette.cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
         .shadow(color: palette.shadow, radius: 0, x: 0, y: 1)
-        .onChange(of: selectedDate) {
-            isYiJiDetailPresented = false
-        }
     }
 
-    /// 农历下方：宜 / 忌各一行，只放能完整显示的事项；点击弹出完整列表。
+    /// 农历下方：宜 / 忌各一行；放不下的部分可左右滚动查看，不再弹出浮层。
     private var yiJiSection: some View {
         let yiJi = ChineseCalendarSupport.dayYiJi(for: selectedDate)
         return VStack(alignment: .leading, spacing: 0) {
             palette.separator
                 .frame(height: 1)
                 .padding(.vertical, CalendarPopoverLayout.yiJiSeparatorSpacing)
-            Button {
-                isYiJiDetailPresented.toggle()
-            } label: {
-                VStack(alignment: .leading, spacing: CalendarPopoverLayout.yiJiRowSpacing) {
-                    CalendarYiJiSummaryRow(label: "宜", items: yiJi.yi, tint: palette.solarTermText, palette: palette)
-                    CalendarYiJiSummaryRow(label: "忌", items: yiJi.ji, tint: palette.festivalText, palette: palette)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .help("查看完整宜忌")
+            CalendarYiJiScrollRows(yi: yiJi.yi, ji: yiJi.ji, palette: palette)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .ignore)
             .accessibilityLabel("宜：\(yiJi.yi.joined(separator: "、"))；忌：\(yiJi.ji.joined(separator: "、"))")
-            .accessibilityHint("查看完整宜忌")
-            .popover(isPresented: $isYiJiDetailPresented, arrowEdge: .bottom) {
-                CalendarYiJiDetailView(date: selectedDate, yiJi: yiJi, palette: palette)
-            }
         }
         .frame(height: CalendarPopoverLayout.yiJiHeight, alignment: .top)
     }
@@ -80,128 +62,78 @@ private struct CalendarYiJiBadge: View {
     }
 }
 
-private struct CalendarYiJiSummaryRow: View {
-    let label: String
-    let items: [String]
-    let tint: Color
+/// 宜 / 忌两行共用一个横向滚动区，一起滚动；标签固定在左侧。
+/// 放不下时可横向滚动（触控板左右滑 / Shift + 滚轮），两端用卡片底色渐变遮住，提示还有内容。
+private struct CalendarYiJiScrollRows: View {
+    let yi: [String]
+    let ji: [String]
     let palette: CalendarPalette
 
+    /// 内容在可视区坐标系中的位置，与可视区宽度一起算出左右各溢出多少。
+    @State private var contentFrame: CGRect = .zero
+    @State private var viewportWidth: CGFloat = 0
+
+    private var leadingOverflow: CGFloat { max(0, -contentFrame.minX) }
+    private var trailingOverflow: CGFloat {
+        viewportWidth > 0 ? max(0, contentFrame.maxX - viewportWidth) : 0
+    }
+
     var body: some View {
-        HStack(spacing: 8) {
-            CalendarYiJiBadge(label: label, tint: tint.opacity(0.8), size: 11, weight: .medium)
-                .frame(width: CalendarPopoverLayout.yiJiRowHeight, alignment: .leading)
-            // 按黄历原顺序单行排列；放得下就原样显示，放不下时行尾渐隐，提示还有更多（点击查看完整列表）
-            ViewThatFits(in: .horizontal) {
-                itemsText
-                // 放在 overlay 里，文字的理想宽度不参与布局，避免把卡片撑宽
-                Color.clear
-                    .frame(maxWidth: .infinity)
-                    .overlay(alignment: .leading) { itemsText }
-                    .clipped()
-                    .mask {
-                        HStack(spacing: 0) {
-                            Color.black
-                            LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
-                                .frame(width: Self.fadeWidth)
-                        }
-                    }
+        HStack(alignment: .top, spacing: 8) {
+            VStack(alignment: .leading, spacing: CalendarPopoverLayout.yiJiRowSpacing) {
+                badge("宜", tint: palette.solarTermText)
+                badge("忌", tint: palette.festivalText)
             }
+            .frame(width: CalendarPopoverLayout.yiJiRowHeight, alignment: .leading)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                VStack(alignment: .leading, spacing: CalendarPopoverLayout.yiJiRowSpacing) {
+                    itemsText(yi)
+                    itemsText(ji)
+                }
+                .onGeometryChange(for: CGRect.self) { proxy in
+                    proxy.frame(in: .named(Self.space))
+                } action: { contentFrame = $0 }
+            }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+            .coordinateSpace(.named(Self.space))
+            .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { viewportWidth = $0 }
+            .overlay(alignment: .leading) { fade(edge: .leading, distance: leadingOverflow) }
+            .overlay(alignment: .trailing) { fade(edge: .trailing, distance: trailingOverflow) }
+            // 换一天时回到行首
+            .id(yi + ji)
         }
-        .frame(height: CalendarPopoverLayout.yiJiRowHeight)
     }
 
     private static let fadeWidth: CGFloat = 36
+    private static let space = "yiJiScroll"
 
-    private var itemsText: some View {
+    private func badge(_ label: String, tint: Color) -> some View {
+        CalendarYiJiBadge(label: label, tint: tint.opacity(0.8), size: 11, weight: .medium)
+            .frame(height: CalendarPopoverLayout.yiJiRowHeight)
+    }
+
+    private func itemsText(_ items: [String]) -> some View {
         Text(items.joined(separator: "  "))
             .font(.system(size: 11))
             .foregroundStyle(palette.secondaryText)
             .lineLimit(1)
             .fixedSize()
-    }
-}
-
-/// 点击宜忌后弹出的完整列表，样式与年月选择弹层一致。
-struct CalendarYiJiDetailView: View {
-    let date: Date
-    let yiJi: DayYiJi
-    let palette: CalendarPalette
-
-    @AppStorage(AppSettings.appThemeKey) private var appThemeRaw = AppTheme.system.rawValue
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(ChineseCalendarSupport.lunarMonthDayLabel(for: date))
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundStyle(palette.primaryText)
-                Spacer()
-                Text("仅供参考")
-                    .font(.system(size: 11))
-                    .foregroundStyle(palette.secondaryText)
-            }
-            section(label: "宜", items: yiJi.yi, tint: palette.solarTermText)
-            section(label: "忌", items: yiJi.ji, tint: palette.festivalText)
-        }
-        .padding(14)
-        .frame(width: 280, alignment: .leading)
-        .background(palette.cardBackground, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .preferredColorScheme(AppTheme(rawValue: appThemeRaw)?.colorScheme)
+            .frame(height: CalendarPopoverLayout.yiJiRowHeight)
     }
 
-    private func section(label: String, items: [String], tint: Color) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            CalendarYiJiBadge(label: label, tint: tint)
-            CalendarFlowLayout(horizontalSpacing: 12, verticalSpacing: 8) {
-                ForEach(items, id: \.self) { item in
-                    Text(item)
-                        .font(.system(size: 13))
-                        .foregroundStyle(palette.primaryText)
-                }
-            }
-        }
-    }
-}
-
-/// 按行从左到右排列，放不下时换行。
-private struct CalendarFlowLayout: Layout {
-    let horizontalSpacing: CGFloat
-    let verticalSpacing: CGFloat
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let maxWidth = proposal.width ?? .infinity
-        let frames = arrange(subviews: subviews, maxWidth: maxWidth)
-        let width = frames.map(\.maxX).max() ?? 0
-        let height = frames.map(\.maxY).max() ?? 0
-        return CGSize(width: proposal.width ?? width, height: height)
+    /// 溢出越少渐变越淡，滚到尽头时平滑消失。
+    private func fade(edge: HorizontalEdge, distance: CGFloat) -> some View {
+        let solid = palette.cardBackground
+        let clear = palette.cardBackground.opacity(0)
+        return LinearGradient(
+            colors: edge == .leading ? [solid, clear] : [clear, solid],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+        .frame(width: Self.fadeWidth)
+        .opacity(min(1, distance / Self.fadeWidth))
+        .allowsHitTesting(false)
     }
 
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let frames = arrange(subviews: subviews, maxWidth: bounds.width)
-        for (subview, frame) in zip(subviews, frames) {
-            subview.place(
-                at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY),
-                proposal: ProposedViewSize(frame.size)
-            )
-        }
-    }
-
-    private func arrange(subviews: Subviews, maxWidth: CGFloat) -> [CGRect] {
-        var frames: [CGRect] = []
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-        var lineHeight: CGFloat = 0
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x > 0, x + size.width > maxWidth {
-                x = 0
-                y += lineHeight + verticalSpacing
-                lineHeight = 0
-            }
-            frames.append(CGRect(origin: CGPoint(x: x, y: y), size: size))
-            x += size.width + horizontalSpacing
-            lineHeight = max(lineHeight, size.height)
-        }
-        return frames
-    }
 }
