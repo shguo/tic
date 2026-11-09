@@ -25,6 +25,31 @@ enum AppTheme: String, CaseIterable, Identifiable {
     }
 }
 
+/// 弹窗配色：与「主题」（浅色 / 深色）正交组合，每套配色都有浅、深两版。
+enum AppColorTheme: String, CaseIterable, Identifiable {
+    case classic
+    case vermilion
+    case jade
+    case indigo
+    case amber
+    case sakura
+    case wisteria
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .classic: "经典（系统强调色）"
+        case .vermilion: "朱砂红"
+        case .jade: "青碧"
+        case .indigo: "黛蓝"
+        case .amber: "琥珀"
+        case .sakura: "樱粉"
+        case .wisteria: "紫藤"
+        }
+    }
+}
+
 enum MenuBarBlock: String, CaseIterable, Identifiable, Codable {
     case icon
     case date
@@ -63,6 +88,7 @@ enum MenuBarBlock: String, CaseIterable, Identifiable, Codable {
 
 enum AppSettings {
     static let appThemeKey = "appTheme"
+    static let appColorThemeKey = "appColorTheme"
     static let showSecondsKey = "showSeconds"
     static let use24HourKey = "use24Hour"
     static let menuBarBlockOrderKey = "menuBarBlockOrder"

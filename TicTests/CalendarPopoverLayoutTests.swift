@@ -137,4 +137,20 @@ final class CalendarPopoverLayoutTests: XCTestCase {
         let sparse = all.filter { $0.title == "春节" || $0.title == "端午节" || $0.title == "中秋节" || $0.title == "国庆节" }
         XCTAssertEqual(CalendarPopoverView.upcomingListEvents(sparse).map(\.title), Array(sparse.prefix(3)).map(\.title))
     }
+
+    func testDayCellRedrawsWhenColorThemeChanges() {
+        // 日期格用 `.equatable()` 跳过重绘：配色不同必须判为不等，否则切换配色后周末 / 今天等颜色不刷新
+        func cell(_ theme: AppColorTheme) -> CalendarDayCellView {
+            CalendarDayCellView(
+                date: Date(timeIntervalSince1970: 0), monthNumber: 1, dayNumber: 3, isToday: false, isWeekend: true,
+                isSelected: false, palette: CalendarPopoverTheme.palette(for: .light, colorTheme: theme),
+                showAnnotationDot: false, subtitle: DaySubtitle(text: "初三", kind: .lunarDay), badge: nil,
+                isInDisplayedMonth: true, onSelect: {}
+            )
+        }
+        XCTAssertEqual(cell(.jade), cell(.jade))
+        for theme in AppColorTheme.allCases where theme != .jade {
+            XCTAssertNotEqual(cell(.jade), cell(theme), "\(theme)")
+        }
+    }
 }

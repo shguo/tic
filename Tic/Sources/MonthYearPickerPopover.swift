@@ -7,11 +7,12 @@ struct MonthYearPickerPopover: View {
     let onGoToCurrentYear: () -> Void
 
     @Environment(\.colorScheme) private var colorScheme
+    @AppStorage(AppSettings.appColorThemeKey) private var appColorThemeRaw = AppColorTheme.classic.rawValue
 
     private let monthColumns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 4)
 
     private var palette: CalendarPalette {
-        CalendarPopoverTheme.palette(for: colorScheme)
+        CalendarPopoverTheme.palette(for: colorScheme, colorTheme: AppColorTheme(rawValue: appColorThemeRaw) ?? .classic)
     }
 
     var body: some View {

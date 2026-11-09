@@ -7,6 +7,8 @@ enum CalendarPaletteAppearance: Equatable {
 
 struct CalendarPalette {
     let appearance: CalendarPaletteAppearance
+    /// 所属配色。日期格按 `.equatable()` 跳过重绘，需与 `appearance` 一起参与比较，否则切换配色后格子不刷新。
+    let colorTheme: AppColorTheme
     let background: Color
     let detailsBackground: Color
     let cardBackground: Color

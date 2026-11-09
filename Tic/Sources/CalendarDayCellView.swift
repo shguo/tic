@@ -54,14 +54,13 @@ struct CalendarDayCellView: View {
                 if let badge {
                     Text(badge.rawValue)
                         .font(.system(size: 10, weight: .medium))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(badgeForeground(badge))
                         .frame(width: 17, height: 17)
-                        .background(badge == .rest ? palette.restBadge : palette.workBadge, in: Circle())
+                        .background(badgeBackground(badge), in: Circle())
                         .offset(x: 1, y: -1)
                 }
             }
             .frame(maxWidth: .infinity)
-            .opacity(isInDisplayedMonth ? 1 : Self.outsideMonthOpacity)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -70,7 +69,25 @@ struct CalendarDayCellView: View {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    private static let outsideMonthOpacity: CGFloat = 0.35
+    /// 首尾补齐的上月 / 下月日期：淡化以区分本月，但仍需看得清。
+    /// 淡化只作用在颜色上，不用视图级 `.opacity`：后者会把整格先画进离屏图层再合成，文字抗锯齿变差、显得发虚。
+    private static let outsideMonthOpacity: CGFloat = 0.55
+
+    private var fade: CGFloat { isInDisplayedMonth ? 1 : Self.outsideMonthOpacity }
+
+    /// 「休 / 班」角标：本月为实心色圆 + 白字；上月 / 下月改为浅色圆底 + 彩色字，
+    /// 跨月放假安排仍清楚可读，又与本月角标一眼可分。
+    private func badgeTint(_ badge: DayBadge) -> Color {
+        badge == .rest ? palette.restBadge : palette.workBadge
+    }
+
+    private func badgeForeground(_ badge: DayBadge) -> Color {
+        isInDisplayedMonth ? .white : badgeTint(badge).opacity(0.9)
+    }
+
+    private func badgeBackground(_ badge: DayBadge) -> Color {
+        isInDisplayedMonth ? badgeTint(badge) : badgeTint(badge).opacity(palette.appearance == .dark ? 0.24 : 0.16)
+    }
 
     // 格高固定为 `CalendarPopoverLayout.gridCellHeight`（46pt），以下尺寸按它排布。
     private static let dayNumberFontSize: CGFloat = 20
@@ -81,25 +98,25 @@ struct CalendarDayCellView: View {
     private var cellBackground: Color {
         if isToday { return palette.accent }
         switch badge {
-        case .rest: return palette.holidayBackground
-        case .work: return palette.workdayBackground
+        case .rest: return palette.holidayBackground.opacity(fade)
+        case .work: return palette.workdayBackground.opacity(fade)
         case nil: return .clear
         }
     }
 
     private var dayTextColor: Color {
         if isToday { return .white }
-        if isWeekend || badge == .rest { return palette.accent }
-        return palette.primaryText
+        if isWeekend || badge == .rest { return palette.accent.opacity(fade) }
+        return palette.primaryText.opacity(fade)
     }
 
     private var subtitleTextColor: Color {
         if isToday { return Color.white.opacity(0.94) }
         // 节日红、节气绿、农历灰：扫一眼即可区分，不必再靠底部圆点
         switch subtitle.kind {
-        case .festival: return palette.festivalText
-        case .solarTerm: return palette.solarTermText
-        case .lunarDay, .lunarMonthStart: return palette.secondaryText
+        case .festival: return palette.festivalText.opacity(fade)
+        case .solarTerm: return palette.solarTermText.opacity(fade)
+        case .lunarDay, .lunarMonthStart: return palette.secondaryText.opacity(fade)
         }
     }
 
@@ -111,7 +128,7 @@ struct CalendarDayCellView: View {
     }
 
     private var dotColor: Color {
-        isToday ? Color.white.opacity(0.78) : palette.dot
+        isToday ? Color.white.opacity(0.78) : palette.dot.opacity(fade)
     }
 
     private var accessibilityLabel: String {
@@ -128,6 +145,7 @@ extension CalendarDayCellView: Equatable {
             && lhs.isWeekend == rhs.isWeekend
             && lhs.isSelected == rhs.isSelected
             && lhs.palette.appearance == rhs.palette.appearance
+            && lhs.palette.colorTheme == rhs.palette.colorTheme
             && lhs.showAnnotationDot == rhs.showAnnotationDot
             && lhs.subtitle == rhs.subtitle
             && lhs.badge == rhs.badge

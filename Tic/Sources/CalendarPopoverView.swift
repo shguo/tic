@@ -17,6 +17,7 @@ struct CalendarPopoverView: View {
     @Environment(\.colorScheme) private var systemColorScheme
 
     @AppStorage(AppSettings.appThemeKey) private var appThemeRaw = AppTheme.system.rawValue
+    @AppStorage(AppSettings.appColorThemeKey) private var appColorThemeRaw = AppColorTheme.classic.rawValue
     @AppStorage(AppSettings.showAnnotationDotsKey) private var showAnnotationDots = AppSettings.showAnnotationDotsDefault
     @AppStorage(AppSettings.showSolarTermsKey) private var showSolarTerms = true
     @AppStorage(AppSettings.showWesternFestivalsKey) private var showWesternFestivals = true
@@ -53,7 +54,10 @@ struct CalendarPopoverView: View {
     }
 
     private var palette: CalendarPalette {
-        CalendarPopoverTheme.palette(for: resolvedColorScheme)
+        CalendarPopoverTheme.palette(
+            for: resolvedColorScheme,
+            colorTheme: AppColorTheme(rawValue: appColorThemeRaw) ?? .classic
+        )
     }
 
     private var displayedMonthNumber: Int {

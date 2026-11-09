@@ -21,8 +21,9 @@ struct CalendarUpcomingListView: View {
                         ForEach(events) { event in
                             CalendarUpcomingRowView(event: event, palette: palette)
                             if event.id != events.last?.id {
-                                Divider()
-                                    .overlay(palette.separator)
+                                // 不用系统 `Divider()`：它在暗色下自带较亮的线色，叠加半透明 `separator` 也盖不住
+                                Rectangle()
+                                    .fill(palette.separator)
                                     .frame(height: CalendarPopoverLayout.upcomingDividerHeight)
                                     .padding(.leading, 20)
                             }
