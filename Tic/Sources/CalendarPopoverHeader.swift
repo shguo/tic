@@ -9,10 +9,12 @@ struct CalendarPopoverHeader: View {
     /// 当前查看年份缺少内置调休数据时的提示；以小图标 + 悬停提示显示在标题行末尾，不占额外行高、不推动其他元素。
     let dataCoverageNotice: String?
     let palette: CalendarPalette
+    let isPinned: Bool
     let onShowMonthPicker: () -> Void
     let onPreviousMonth: () -> Void
     let onGoToToday: () -> Void
     let onNextMonth: () -> Void
+    let onTogglePin: () -> Void
     let onShowSettings: () -> Void
 
     private static let monthFontSize: CGFloat = 34
@@ -34,8 +36,8 @@ struct CalendarPopoverHeader: View {
     }()
 
     var body: some View {
-        HStack(alignment: .center, spacing: 12) {
-            HStack(alignment: .lastTextBaseline, spacing: 8) {
+        HStack(alignment: .center, spacing: 8) {
+            HStack(alignment: .lastTextBaseline, spacing: 6) {
                 Button(action: onShowMonthPicker) {
                     Text("\(monthNumber)月")
                         .font(.system(size: Self.monthFontSize, weight: .medium))
@@ -80,14 +82,9 @@ struct CalendarPopoverHeader: View {
 
             Spacer(minLength: 0)
 
-            HStack(spacing: 10) {
+            HStack(spacing: 8) {
                 monthNavigationControl
-
-                headerIconButton(
-                    systemName: "gearshape.fill",
-                    accessibilityLabel: "打开设置",
-                    action: onShowSettings
-                )
+                toolControl
             }
         }
     }
@@ -120,7 +117,7 @@ struct CalendarPopoverHeader: View {
             Button(action: onGoToToday) {
                 Text("今")
                     .font(.system(size: 11, weight: .semibold))
-                    .frame(width: 30, height: 24)
+                    .frame(width: 26, height: 24)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -157,7 +154,7 @@ struct CalendarPopoverHeader: View {
         Button(action: action) {
             Image(systemName: systemName)
                 .font(.system(size: 10, weight: .bold))
-                .frame(width: 27, height: 24)
+                .frame(width: 24, height: 24)
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -165,23 +162,60 @@ struct CalendarPopoverHeader: View {
         .help(accessibilityLabel)
     }
 
-    private func headerIconButton(
+    /// 钉住 + 设置，与月份切换同款胶囊：标题行宽度有限，合并后比两个独立圆形按钮更省空间。
+    private var toolControl: some View {
+        HStack(spacing: 0) {
+            pinButton
+
+            divider
+
+            toolButton(
+                systemName: "gearshape.fill",
+                accessibilityLabel: "打开设置",
+                action: onShowSettings
+            )
+        }
+        .foregroundStyle(palette.primaryText)
+        .background(palette.controlBackground, in: Capsule())
+        .overlay {
+            Capsule().strokeBorder(palette.controlBorder)
+        }
+    }
+
+    /// 通用约定：图钉 45° 倾斜 = 未钉住，竖直插下 = 已钉住。
+    /// SF Symbols 的 `pin` 本身竖直（针尖朝下）：钉住时原样，未钉住时顺时针转 45°（针尖朝左下）。
+    private var pinButton: some View {
+        let label = isPinned ? "取消钉住" : "钉住：点击其他应用时不收起"
+        return Button(action: onTogglePin) {
+            Image(systemName: isPinned ? "pin.fill" : "pin")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(isPinned ? palette.accent : palette.primaryText)
+                .rotationEffect(.degrees(isPinned ? 0 : 45))
+                // 图钉字形上重下轻、旋转后重心再偏移：按截图实测的视觉重心（像素墨量加权）
+                // 对到按钮中心，并与齿轮重心同高。改字号 / 字重后需重新测量。
+                .offset(x: isPinned ? 0.5 : -0.75, y: isPinned ? 1.15 : 1.1)
+                .animation(.easeOut(duration: 0.15), value: isPinned)
+                .frame(width: 24, height: 24)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(label)
+        .help(label)
+    }
+
+    private func toolButton(
         systemName: String,
         accessibilityLabel: String,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             Image(systemName: systemName)
-                .font(.system(size: 12, weight: .semibold))
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(palette.primaryText)
                 .frame(width: 24, height: 24)
-                .background(palette.controlBackground, in: Circle())
-                .overlay {
-                    Circle().strokeBorder(palette.controlBorder)
-                }
+                .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .contentShape(Circle())
         .accessibilityLabel(accessibilityLabel)
         .help(accessibilityLabel)
     }

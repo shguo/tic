@@ -99,6 +99,8 @@ enum AppSettings {
     static let showSolarTermsKey = "showSolarTerms"
     static let showWesternFestivalsKey = "showWesternFestivals"
     static let showYiJiKey = "showYiJi"
+    /// 日历弹窗是否钉住：钉住后点击其他应用不会收起弹窗。
+    static let popoverPinnedKey = "popoverPinned"
     static let launchAtLoginKey = "launchAtLogin"
     static let legacyDateFormatStyleKey = "dateFormatStyle"
 

@@ -53,6 +53,7 @@ scripts/restart-dev.sh
 - 入口：`Tic/Sources/TicApp.swift`
 - 状态栏标签：`Tic/Sources/MenuBarDateLabel.swift`（`ImageRenderer` 定宽位图；`MenuBarDisplayComposer.swift` 拼文案）
 - 日历弹出层：`Tic/Sources/CalendarPopoverView.swift`
+- 钉住弹窗：`Tic/Sources/MenuBarWindowPinner.swift`（`MenuBarExtra` 无公开 API，挂钩宿主窗口类的 `orderWindow:relativeTo:` 拦下收起；点状态栏图标 / Esc 仍可关闭。不要改成替换窗口实例 isa，窗口已是 KVO 子类会崩溃）
 - 月历 / 后续提醒合并：`Tic/Sources/CalendarMonthBuilder.swift`（节日 + 节气 + 放假数据 → 月历格、后续提醒、下个假期；显示选项 `CalendarDisplayOptions`）
 - 节日：`Tic/Sources/Festival/FestivalCatalog.swift`（唯一节日表，分传统 / 官方 / 西方三档）、`Festival/FestivalCalendar.swift`（按公历年推算并缓存）
 - 农历 / 节气：`Tic/Sources/ChineseCalendarSupport.swift`（农历文字、干支、宜忌）、`Tic/Sources/SolarTermSupport.swift`（二十四节气，LunarSwift 算法、按公历年缓存）；东八区日历共用 `BeijingCalendar.swift`——应用内「某一天」统一用东八区该日零点表示，设备时区只用于判断「现在是几号」（`BeijingCalendar.day(containing:)`），界面不要再用 `Calendar(identifier:)` / `Calendar.current` 处理日期

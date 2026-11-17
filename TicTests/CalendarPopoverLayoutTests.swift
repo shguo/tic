@@ -85,8 +85,8 @@ final class CalendarPopoverLayoutTests: XCTestCase {
         for label in ["123天后", "999天后"] {
             let header = CalendarPopoverHeader(
                 monthNumber: 12, year: 2027, relativeOffsetLabel: label, nextRestDayCountdownLabel: nil,
-                dataCoverageNotice: "2027 年放假安排待更新", palette: palette,
-                onShowMonthPicker: {}, onPreviousMonth: {}, onGoToToday: {}, onNextMonth: {}, onShowSettings: {}
+                dataCoverageNotice: "2027 年放假安排待更新", palette: palette, isPinned: true,
+                onShowMonthPicker: {}, onPreviousMonth: {}, onGoToToday: {}, onNextMonth: {}, onTogglePin: {}, onShowSettings: {}
             )
             let host = NSHostingView(rootView: header.fixedSize())
             host.layoutSubtreeIfNeeded()
@@ -100,8 +100,8 @@ final class CalendarPopoverLayoutTests: XCTestCase {
         let widths = ["明天", "今天", "5天后", "36天前", "123天后", "999天后", "888天前"].map { label -> CGFloat in
             let header = CalendarPopoverHeader(
                 monthNumber: 10, year: 2026, relativeOffsetLabel: label, nextRestDayCountdownLabel: nil,
-                dataCoverageNotice: "2027 年放假安排待更新", palette: palette,
-                onShowMonthPicker: {}, onPreviousMonth: {}, onGoToToday: {}, onNextMonth: {}, onShowSettings: {}
+                dataCoverageNotice: "2027 年放假安排待更新", palette: palette, isPinned: true,
+                onShowMonthPicker: {}, onPreviousMonth: {}, onGoToToday: {}, onNextMonth: {}, onTogglePin: {}, onShowSettings: {}
             )
             let host = NSHostingView(rootView: header.fixedSize())
             host.layoutSubtreeIfNeeded()

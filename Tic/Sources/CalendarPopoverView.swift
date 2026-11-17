@@ -22,6 +22,7 @@ struct CalendarPopoverView: View {
     @AppStorage(AppSettings.showSolarTermsKey) private var showSolarTerms = true
     @AppStorage(AppSettings.showWesternFestivalsKey) private var showWesternFestivals = true
     @AppStorage(AppSettings.showYiJiKey) private var showYiJi = true
+    @AppStorage(AppSettings.popoverPinnedKey) private var isPinned = false
 
     /// 选中日 / 展示月均为东八区零点，见 `BeijingCalendar` 的约定。
     private let calendar = BeijingCalendar.gregorian
@@ -102,10 +103,12 @@ struct CalendarPopoverView: View {
                 nextRestDayCountdownLabel: nextRestDayCountdownLabel,
                 dataCoverageNotice: dataCoverageNotice,
                 palette: palette,
+                isPinned: isPinned,
                 onShowMonthPicker: showMonthPicker,
                 onPreviousMonth: { shiftMonth(by: -1) },
                 onGoToToday: goToToday,
                 onNextMonth: { shiftMonth(by: 1) },
+                onTogglePin: togglePin,
                 onShowSettings: showSettings
             )
             .frame(height: CalendarPopoverLayout.headerHeight)
@@ -195,6 +198,8 @@ struct CalendarPopoverView: View {
             refreshCalendarData(displayedMonth: displayedMonth, selectedDate: selectedDate)
         }
         .background { monthKeyboardShortcuts }
+        // 钉住时点击其他应用不收起弹窗，见 MenuBarPopoverPin。
+        .background { MenuBarWindowPinner() }
     }
 
     private var monthKeyboardShortcuts: some View {
@@ -290,6 +295,11 @@ struct CalendarPopoverView: View {
         } else {
             withoutAnimation(updates)
         }
+    }
+
+    private func togglePin() {
+        isPinned.toggle()
+        MenuBarPopoverPin.pinStateDidChange()
     }
 
     private func showSettings() {
