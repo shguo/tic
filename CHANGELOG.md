@@ -5,6 +5,12 @@
 
 ## [Unreleased]
 
+## [1.3.14] - 2026-11-17
+
+### 定制版（shguo/tic）
+
+- 日历弹窗新增「钉住」：点标题栏右侧的图钉后，点击其他应用或桌面时弹窗不再收起；再次点菜单栏图标即可关闭，钉住状态会记住
+
 ## [1.3.13] - 2026-11-09
 
 ### 定制版（shguo/tic）
@@ -242,7 +248,9 @@
 - 登录时自动启动
 - macOS 应用图标
 
-[Unreleased]: https://github.com/shguo/tic/compare/v1.3.12...HEAD
+[Unreleased]: https://github.com/shguo/tic/compare/v1.3.14...HEAD
+[1.3.14]: https://github.com/shguo/tic/compare/v1.3.13...v1.3.14
+[1.3.13]: https://github.com/shguo/tic/compare/v1.3.12...v1.3.13
 [1.3.12]: https://github.com/shguo/tic/compare/v1.3.11...v1.3.12
 [1.3.11]: https://github.com/shguo/tic/compare/v1.3.10...v1.3.11
 [1.3.10]: https://github.com/shguo/tic/compare/v1.3.9...v1.3.10
